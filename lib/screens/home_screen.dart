@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:rizervitoo/screens/welcome_screen.dart';
 import 'package:rizervitoo/screens/profile_screen.dart';
 import 'package:rizervitoo/screens/travel_guides_screen.dart';
+import 'package:rizervitoo/screens/accommodations_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -202,11 +203,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   Expanded(
                     child: _buildQuickActionCard(
                       icon: Icons.hotel,
-                      title: 'الفنادق',
-                      subtitle: 'احجز فندقك',
+                      title: 'الإقامات',
+                      subtitle: 'احجز إقامتك',
                       color: Colors.orange,
                       onTap: () {
-                        // TODO: Navigate to hotels
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AccommodationsScreen(),
+                          ),
+                        );
                       },
                     ),
                   ),
