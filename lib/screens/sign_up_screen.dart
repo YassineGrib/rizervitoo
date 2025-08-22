@@ -165,22 +165,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       child: Container(
                         width: 70,
                         height: 70,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(14),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 15,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(14),
-                          child: Image.asset(
-                            'assest/images/logo_black.png',
-                            fit: BoxFit.contain,
-                          ),
+                        child: Image.asset(
+                          'assest/images/logo_black.png',
+                          fit: BoxFit.contain,
                         ),
                       ),
                     ),

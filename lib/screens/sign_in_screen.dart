@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rizervitoo/screens/sign_up_screen.dart';
 import 'package:rizervitoo/screens/forgot_password_screen.dart';
 import 'package:rizervitoo/screens/home_screen.dart';
@@ -17,6 +18,7 @@ class _SignInScreenState extends State<SignInScreen> {
   final _passwordController = TextEditingController();
   bool _isLoading = false;
   bool _obscurePassword = true;
+  bool _rememberMe = false;
 
   @override
   void dispose() {
@@ -37,6 +39,13 @@ class _SignInScreenState extends State<SignInScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
+      
+      // Save login state if remember me is checked
+      if (_rememberMe) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('remember_login', true);
+        await prefs.setString('user_email', _emailController.text.trim());
+      }
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -140,22 +149,9 @@ class _SignInScreenState extends State<SignInScreen> {
                       child: Container(
                         width: 80,
                         height: 80,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 15,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: Image.asset(
-                            'assest/images/logo_black.png',
-                            fit: BoxFit.contain,
-                          ),
+                        child: Image.asset(
+                          'assest/images/logo_black.png',
+                          fit: BoxFit.contain,
                         ),
                       ),
                     ),
@@ -269,27 +265,52 @@ class _SignInScreenState extends State<SignInScreen> {
                     
                     const SizedBox(height: 16),
                     
-                    // Forgot Password
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const ForgotPasswordScreen(),
+                    // Remember Me and Forgot Password Row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Remember Me Checkbox
+                        Row(
+                          children: [
+                            Checkbox(
+                              value: _rememberMe,
+                              onChanged: (value) {
+                                setState(() {
+                                  _rememberMe = value ?? false;
+                                });
+                              },
+                              activeColor: Colors.blue.shade600,
                             ),
-                          );
-                        },
-                        child: Text(
-                          'نسيت كلمة المرور؟',
-                          style: TextStyle(
-                            fontFamily: 'Tajawal',
-                            color: Colors.blue.shade600,
-                            fontWeight: FontWeight.w500,
+                            Text(
+                              'تذكرني',
+                              style: TextStyle(
+                                fontFamily: 'Tajawal',
+                                color: Colors.grey.shade700,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                        // Forgot Password
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ForgotPasswordScreen(),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            'نسيت كلمة المرور؟',
+                            style: TextStyle(
+                              fontFamily: 'Tajawal',
+                              color: Colors.blue.shade600,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
                     
                     const SizedBox(height: 32),

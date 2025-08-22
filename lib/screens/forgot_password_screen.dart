@@ -122,22 +122,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     child: Container(
                       width: 80,
                       height: 80,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 20,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: Image.asset(
-                          'assest/images/logo_black.png',
-                          fit: BoxFit.contain,
-                        ),
+                      child: Image.asset(
+                        'assest/images/logo_black.png',
+                        fit: BoxFit.contain,
                       ),
                     ),
                   ),

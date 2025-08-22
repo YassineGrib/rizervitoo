@@ -40,6 +40,9 @@ dependencies:
   
   # Image picker for profile avatar
   image_picker: ^1.0.4
+  
+  # SharedPreferences for persistent storage
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:
