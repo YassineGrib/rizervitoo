@@ -305,14 +305,31 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           const SizedBox(height: 24),
           
           // Quick Actions Title
-          Text(
-            'الخدمات السريعة',
-            style: TextStyle(
-              fontFamily: 'Amiri',
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey.shade800,
-            ),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppStyles.primaryColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.flash_on,
+                  color: AppStyles.primaryColor,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'الخدمات السريعة',
+                style: TextStyle(
+                  fontFamily: 'Amiri',
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade800,
+                ),
+              ),
+            ],
           ),
           
           const SizedBox(height: 16),
@@ -333,14 +350,31 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           const SizedBox(height: 24),
           
           // Recent Bookings Section
-          Text(
-            'الحجوزات الأخيرة',
-            style: TextStyle(
-              fontFamily: 'Amiri',
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey.shade800,
-            ),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.history,
+                  color: Colors.orange,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'الحجوزات الأخيرة',
+                style: TextStyle(
+                  fontFamily: 'Amiri',
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade800,
+                ),
+              ),
+            ],
           ),
           
           const SizedBox(height: 16),

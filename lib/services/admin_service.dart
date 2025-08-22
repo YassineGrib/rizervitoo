@@ -54,11 +54,21 @@ class AdminService {
       final usersResponse = await _supabase.from('profiles').select('id').count(CountOption.exact);
       final accommodationsResponse = await _supabase.from('accommodations').select('id').count(CountOption.exact);
       
+      // Get travel agencies statistics
+      final totalAgenciesResponse = await _supabase.from('travel_agencies').select('id').count(CountOption.exact);
+      final activeAgenciesResponse = await _supabase.from('travel_agencies').select('id').eq('is_active', true).count(CountOption.exact);
+      final verifiedAgenciesResponse = await _supabase.from('travel_agencies').select('id').eq('is_active', true).eq('is_verified', true).count(CountOption.exact);
+      final agencyOffersResponse = await _supabase.from('travel_agency_offers').select('id').eq('is_active', true).count(CountOption.exact);
+      
       // Get actual counts
       final totalGuides = guidesResponse.count ?? 0;
       final publishedGuides = publishedGuidesResponse.count ?? 0;
       final totalUsers = usersResponse.count ?? 0;
       final totalAccommodations = accommodationsResponse.count ?? 0;
+      final totalAgencies = totalAgenciesResponse.count ?? 0;
+      final activeAgencies = activeAgenciesResponse.count ?? 0;
+      final verifiedAgencies = verifiedAgenciesResponse.count ?? 0;
+      final totalOffers = agencyOffersResponse.count ?? 0;
       
       return {
         'total_guides': totalGuides,
@@ -66,6 +76,12 @@ class AdminService {
         'draft_guides': totalGuides - publishedGuides,
         'total_users': totalUsers,
         'total_accommodations': totalAccommodations,
+        'total_agencies': totalAgencies,
+        'active_agencies': activeAgencies,
+        'inactive_agencies': totalAgencies - activeAgencies,
+        'verified_agencies': verifiedAgencies,
+        'unverified_agencies': activeAgencies - verifiedAgencies,
+        'total_offers': totalOffers,
         'active_users': (totalUsers * 0.8).round(), // 80% active
         'new_users_this_month': (totalUsers * 0.2).round(), // 20% new
         'total_bookings': totalUsers * 2, // Mock: 2 bookings per user
@@ -80,6 +96,12 @@ class AdminService {
         'draft_guides': 0,
         'total_users': 0,
         'total_accommodations': 0,
+        'total_agencies': 0,
+        'active_agencies': 0,
+        'inactive_agencies': 0,
+        'verified_agencies': 0,
+        'unverified_agencies': 0,
+        'total_offers': 0,
         'active_users': 0,
         'new_users_this_month': 0,
         'total_bookings': 0,

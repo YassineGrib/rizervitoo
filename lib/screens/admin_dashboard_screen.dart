@@ -113,7 +113,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             tooltip: 'تحديث الإحصائيات',
           ),
           IconButton(
-            icon: const Icon(Icons.logout),
+            icon: Icon(Icons.logout, color: Colors.red),
             onPressed: _handleLogout,
             tooltip: 'تسجيل الخروج',
           ),
@@ -198,19 +198,28 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   Widget _buildWelcomeSection() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppStyles.primaryColor, AppStyles.primaryColor.withOpacity(0.8)],
+          colors: [
+            AppStyles.primaryColor,
+            AppStyles.primaryColor.withOpacity(0.8),
+            AppStyles.primaryColor.withOpacity(0.6),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppStyles.primaryColor.withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: AppStyles.primaryColor.withOpacity(0.4),
+            blurRadius: 25,
+            offset: const Offset(0, 12),
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
@@ -220,18 +229,22 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.white.withOpacity(0.25),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.3),
+                    width: 1,
+                  ),
                 ),
                 child: const Icon(
                   Icons.admin_panel_settings,
                   color: Colors.white,
-                  size: 32,
+                  size: 36,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 20),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -270,46 +283,81 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'الإحصائيات العامة',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'Amiri',
-          ),
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppStyles.primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                Icons.analytics,
+                color: AppStyles.primaryColor,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text(
+              'الإحصائيات العامة',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Amiri',
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
         GridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: 1.5,
+          crossAxisSpacing: 18,
+          mainAxisSpacing: 18,
+          childAspectRatio: 1.4,
           children: [
             _buildStatCard(
               'الأدلة السياحية',
               _stats!['total_guides'].toString(),
               Icons.map_outlined,
               Colors.blue,
-            ),
-            _buildStatCard(
-              'الأدلة المنشورة',
-              _stats!['published_guides'].toString(),
-              Icons.publish,
-              Colors.green,
+              subtitle: '${_stats!['published_guides']} منشورة',
             ),
             _buildStatCard(
               'المستخدمين',
               _stats!['total_users'].toString(),
               Icons.people_outline,
               Colors.orange,
+              subtitle: '${_stats!['active_users']} نشط',
+            ),
+            _buildStatCard(
+              'الوكالات السياحية',
+              _stats!['total_agencies'].toString(),
+              Icons.business_outlined,
+              Colors.teal,
+              subtitle: '${_stats!['verified_agencies']} معتمدة',
+            ),
+            _buildStatCard(
+              'العروض السياحية',
+              _stats!['total_offers'].toString(),
+              Icons.local_offer_outlined,
+              Colors.indigo,
+              subtitle: 'عروض نشطة',
             ),
             _buildStatCard(
               'الإقامات',
               _stats!['total_accommodations'].toString(),
               Icons.hotel_outlined,
               Colors.purple,
+              subtitle: 'أماكن إقامة',
+            ),
+            _buildStatCard(
+              'الوكالات النشطة',
+              _stats!['active_agencies'].toString(),
+              Icons.verified_outlined,
+              Colors.green,
+              subtitle: '${_stats!['inactive_agencies']} معطلة',
             ),
           ],
         ),
@@ -317,61 +365,79 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(String title, String value, IconData icon, Color color, {String? subtitle}) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 15,
             offset: const Offset(0, 5),
           ),
         ],
       ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              icon,
-              color: color,
-              size: 20,
-            ),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  icon,
+                  color: color,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[800],
+                    fontFamily: 'Tajawal',
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 8),
-          Flexible(
-            child: Text(
-              value,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[800],
-              ),
+          Text(
+            title,
+            textAlign: TextAlign.start,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[600],
+              fontFamily: 'Tajawal',
             ),
           ),
-          const SizedBox(height: 2),
-          Flexible(
-            child: Text(
-              title,
-              textAlign: TextAlign.center,
-              maxLines: 2,
+          if (subtitle != null) ...[
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              textAlign: TextAlign.start,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 10,
-                color: Colors.grey[600],
+                color: color.withOpacity(0.8),
                 fontFamily: 'Tajawal',
               ),
             ),
-          ),
+          ]
         ],
       ),
     );
@@ -381,21 +447,37 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'إدارة النظام',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'Amiri',
-          ),
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.settings,
+                color: Colors.orange,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text(
+              'إدارة النظام',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Amiri',
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
         Row(
           children: [
             Expanded(
               child: _buildManagementCard(
                 'إدارة الأدلة السياحية',
-                'إضافة وتعديل وحذف الأدلة السياحية',
                 Icons.map,
                 Colors.blue,
                 () {
@@ -407,11 +489,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 },
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 18),
             Expanded(
               child: _buildManagementCard(
                 'إدارة المستخدمين',
-                'عرض وإدارة حسابات المستخدمين',
                 Icons.people,
                 Colors.green,
                 () {
@@ -425,20 +506,18 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 18),
         
         _buildManagementCard(
           'إدارة الوكالات السياحية',
-          'إضافة وتعديل وحذف الوكالات السياحية والعروض',
           Icons.business,
           Colors.orange,
-          () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const TravelAgenciesAdminScreen(),
-              ),
-            );
-          },
+          () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const TravelAgenciesAdminScreen(),
+            ),
+          ),
         ),
       ],
     );
@@ -446,60 +525,85 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
   Widget _buildManagementCard(
     String title,
-    String description,
     IconData icon,
     Color color,
     VoidCallback onTap,
   ) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: color.withOpacity(0.1),
+              width: 1,
             ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
                 color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
+                blurRadius: 15,
+                offset: const Offset(0, 8),
               ),
-              child: Icon(
-                icon,
-                color: color,
-                size: 24,
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Amiri',
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      color.withOpacity(0.15),
+                      color.withOpacity(0.08),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: color.withOpacity(0.2),
+                    width: 1,
+                  ),
+                ),
+                child: Icon(
+                  icon,
+                  color: color,
+                  size: 28,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              description,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-                fontFamily: 'Tajawal',
+              const SizedBox(height: 18),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Amiri',
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              Container(
+                height: 3,
+                width: 40,
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.6),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

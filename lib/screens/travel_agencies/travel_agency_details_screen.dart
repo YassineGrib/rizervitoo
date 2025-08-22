@@ -103,7 +103,7 @@ class _TravelAgencyDetailsScreenState extends State<TravelAgencyDetailsScreen>
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             SliverAppBar(
-              expandedHeight: 200,
+              // expandedHeight: 200,
               floating: false,
               pinned: true,
               backgroundColor: Theme.of(context).primaryColor,
@@ -112,16 +112,17 @@ class _TravelAgencyDetailsScreenState extends State<TravelAgencyDetailsScreen>
                 title: Text(
                   _agency!.name,
                   style: const TextStyle(
-                    fontFamily: 'Amiri',
+                    fontFamily: 'tajawal',
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    shadows: [
-                      Shadow(
-                        offset: Offset(0, 1),
-                        blurRadius: 3,
-                        color: Colors.black26,
-                      ),
-                    ],
+                     color: Colors.white,
+                    // shadows: [
+                    //   Shadow(
+                    //     offset: Offset(0, 1),
+                    //     blurRadius: 3,
+                    //     color: Colors.white,
+                    //   ),
+                    // ],
                   ),
                 ),
                 background: Container(
@@ -230,11 +231,15 @@ class _TravelAgencyDetailsScreenState extends State<TravelAgencyDetailsScreen>
                     ),
                     const SizedBox(height: 8),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Icon(
-                          Icons.star,
-                          size: 16,
-                          color: Colors.amber[300],
+                        Text(
+                          '(${_agency!.totalReviews} تقييم)',
+                          style: const TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 12,
+                            color: Colors.white70,
+                          ),
                         ),
                         const SizedBox(width: 4),
                         Text(
@@ -247,13 +252,10 @@ class _TravelAgencyDetailsScreenState extends State<TravelAgencyDetailsScreen>
                           ),
                         ),
                         const SizedBox(width: 4),
-                        Text(
-                          '(${_agency!.totalReviews} تقييم)',
-                          style: const TextStyle(
-                            fontFamily: 'Tajawal',
-                            fontSize: 12,
-                            color: Colors.white70,
-                          ),
+                        Icon(
+                          Icons.star,
+                          size: 16,
+                          color: Colors.amber[300],
                         ),
                       ],
                     ),
