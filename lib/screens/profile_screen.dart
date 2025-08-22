@@ -545,7 +545,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
-          value: _selectedLanguage,
+          initialValue: _selectedLanguage,
           onChanged: _isEditing ? (String? newValue) {
             if (newValue != null) {
               setState(() => _selectedLanguage = newValue);

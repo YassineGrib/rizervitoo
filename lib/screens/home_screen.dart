@@ -4,6 +4,7 @@ import 'package:rizervitoo/screens/welcome_screen.dart';
 import 'package:rizervitoo/screens/profile_screen.dart';
 import 'package:rizervitoo/screens/travel_guides_screen.dart';
 import 'package:rizervitoo/screens/accommodations_screen.dart';
+import 'package:rizervitoo/screens/bookings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -27,11 +28,8 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'حدث خطأ في تسجيل الخروج',
-              style: TextStyle(fontFamily: 'Tajawal'),
-            ),
+          SnackBar(
+            content: Text('خطأ في تسجيل الخروج: $error'),
             backgroundColor: Colors.red,
           ),
         );
@@ -52,295 +50,302 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Widget _getSelectedScreen() {
+    switch (_selectedIndex) {
+      case 0:
+        return _buildHomeContent();
+      case 1:
+        return _buildSearchContent();
+      case 2:
+        return const BookingsScreen();
+      default:
+        return _buildHomeContent();
+    }
+  }
+
+  Widget _buildSearchContent() {
+    return const Center(
+      child: Text(
+        'البحث قيد التطوير',
+        style: TextStyle(
+          fontFamily: 'Tajawal',
+          fontSize: 18,
+          color: Colors.grey,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: Colors.grey.shade50,
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          automaticallyImplyLeading: false,
-          title: Row(
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        title: Row(
+          children: [
+            Image.asset(
+              'assest/images/logo_blue.png',
+              height: 32,
+            ),
+            const SizedBox(width: 12),
+            const Text(
+              'ريزرفيتو',
+              style: TextStyle(
+                fontFamily: 'Amiri',
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          Stack(
             children: [
-              // Logo
-              Container(
-                width: 40,
-                height: 40,
-                child: Image.asset(
-                  'assest/images/logo_black.png',
-                  fit: BoxFit.contain,
+              IconButton(
+                onPressed: () {
+                  // TODO: Handle notifications
+                },
+                icon: Icon(
+                  Icons.notifications_outlined,
+                  color: Colors.grey.shade700,
+                  size: 24,
+                ),
+              ),
+              Positioned(
+                right: 8,
+                top: 8,
+                child: Container(
+                  width: 8,
+                  height: 8,
+                  decoration: const BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          IconButton(
+            onPressed: _logout,
+            icon: Icon(
+              Icons.logout,
+              color: Colors.red.shade600,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
+      body: _getSelectedScreen(),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.white,
+        selectedItemColor: Colors.blue.shade600,
+        unselectedItemColor: Colors.grey.shade600,
+        selectedLabelStyle: const TextStyle(
+          fontFamily: 'Tajawal',
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: const TextStyle(
+          fontFamily: 'Tajawal',
+        ),
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'الرئيسية',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            label: 'البحث',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bookmark),
+            label: 'الحجوزات',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'الملف الشخصي',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHomeContent() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Welcome Message
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+                colors: [
+                  Colors.blue.shade600,
+                  Colors.blue.shade800,
+                ],
+              ),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'مرحباً بك في ريزرفيتو',
+                  style: TextStyle(
+                    fontFamily: 'Amiri',
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'اكتشف أجمل الوجهات السياحية في الجزائر',
+                  style: TextStyle(
+                    fontFamily: 'Tajawal',
+                    fontSize: 16,
+                    color: Colors.white.withOpacity(0.9),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 24),
+          
+          // Quick Actions Title
+          Text(
+            'الخدمات السريعة',
+            style: TextStyle(
+              fontFamily: 'Amiri',
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey.shade800,
+            ),
+          ),
+          
+          const SizedBox(height: 16),
+          
+          // Quick Action Cards - 3 in a row
+          Row(
+            children: [
+              Expanded(
+                child: _buildQuickActionCard(
+                  icon: Icons.hotel,
+                  title: 'الإقامات',
+                  subtitle: 'احجز إقامتك',
+                  color: Colors.orange,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AccommodationsScreen(),
+                      ),
+                    );
+                  },
                 ),
               ),
               const SizedBox(width: 12),
-              Text(
-                'ريزرفيتو',
-                style: TextStyle(
-                  fontFamily: 'Amiri',
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue.shade800,
+              Expanded(
+                child: _buildQuickActionCard(
+                  icon: Icons.home,
+                  title: 'المنازل',
+                  subtitle: 'استأجر منزل',
+                  color: Colors.green,
+                  onTap: () {
+                    // TODO: Navigate to houses
+                  },
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildQuickActionCard(
+                  icon: Icons.bed,
+                  title: 'المراقد',
+                  subtitle: 'احجز مرقدك',
+                  color: Colors.purple,
+                  onTap: () {
+                    // TODO: Navigate to beds
+                  },
                 ),
               ),
             ],
           ),
-          actions: [
-            // Notification Icon
-            IconButton(
-              onPressed: () {
-                // TODO: Navigate to notifications
-              },
-              icon: Stack(
-                children: [
-                  Icon(
-                    Icons.notifications_outlined,
-                    color: Colors.blue.shade600,
-                    size: 26,
-                  ),
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    child: Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      constraints: const BoxConstraints(
-                        minWidth: 12,
-                        minHeight: 12,
-                      ),
-                      child: const Text(
-                        '3',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 8,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+          
+          const SizedBox(height: 16),
+          
+          // Travel Guide Card - Full Width
+          _buildTravelGuideCard(),
+          
+          const SizedBox(height: 24),
+          
+          // Recent Bookings Section
+          Text(
+            'الحجوزات الأخيرة',
+            style: TextStyle(
+              fontFamily: 'Amiri',
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey.shade800,
             ),
-            // Logout Icon
-            IconButton(
-              onPressed: _logout,
-              icon: Icon(
-                Icons.logout,
-                color: Colors.red.shade600,
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: 8),
-          ],
-        ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Welcome Message
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topRight,
-                    end: Alignment.bottomLeft,
-                    colors: [
-                      Colors.blue.shade600,
-                      Colors.blue.shade800,
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'مرحباً بك في ريزرفيتو',
-                      style: TextStyle(
-                        fontFamily: 'Amiri',
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'اكتشف أجمل الوجهات السياحية في الجزائر',
-                      style: TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontSize: 16,
-                        color: Colors.white.withOpacity(0.9),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              
-              const SizedBox(height: 24),
-              
-              // Quick Actions Title
-              Text(
-                'الخدمات السريعة',
-                style: TextStyle(
-                  fontFamily: 'Amiri',
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey.shade800,
-                ),
-              ),
-              
-              const SizedBox(height: 16),
-              
-              // Quick Action Cards - 3 in a row
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildQuickActionCard(
-                      icon: Icons.hotel,
-                      title: 'الإقامات',
-                      subtitle: 'احجز إقامتك',
-                      color: Colors.orange,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const AccommodationsScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildQuickActionCard(
-                      icon: Icons.home,
-                      title: 'المنازل',
-                      subtitle: 'استأجر منزل',
-                      color: Colors.green,
-                      onTap: () {
-                        // TODO: Navigate to houses
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildQuickActionCard(
-                      icon: Icons.bed,
-                      title: 'المراقد',
-                      subtitle: 'احجز مرقدك',
-                      color: Colors.purple,
-                      onTap: () {
-                        // TODO: Navigate to beds
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              
-              const SizedBox(height: 16),
-              
-              // Travel Guide Card - Full Width
-              _buildTravelGuideCard(),
-              
-              const SizedBox(height: 24),
-              
-              // Recent Bookings Section
-              Text(
-                'الحجوزات الأخيرة',
-                style: TextStyle(
-                  fontFamily: 'Amiri',
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey.shade800,
-                ),
-              ),
-              
-              const SizedBox(height: 16),
-              
-              // Recent Bookings List
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.bookmark_border,
-                      size: 48,
-                      color: Colors.grey.shade400,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'لا توجد حجوزات حتى الآن',
-                      style: TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontSize: 16,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'ابدأ بحجز إقامتك الأولى',
-                      style: TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontSize: 14,
-                        color: Colors.grey.shade500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
           ),
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.white,
-          selectedItemColor: Colors.blue.shade600,
-          unselectedItemColor: Colors.grey.shade600,
-          selectedLabelStyle: const TextStyle(
-            fontFamily: 'Tajawal',
-            fontWeight: FontWeight.w600,
+          
+          const SizedBox(height: 16),
+          
+          // Recent Bookings List
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.bookmark_border,
+                  size: 48,
+                  color: Colors.grey.shade400,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'لا توجد حجوزات حتى الآن',
+                  style: TextStyle(
+                    fontFamily: 'Tajawal',
+                    fontSize: 16,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'ابدأ بحجز إقامتك الأولى',
+                  style: TextStyle(
+                    fontFamily: 'Tajawal',
+                    fontSize: 14,
+                    color: Colors.grey.shade500,
+                  ),
+                ),
+              ],
+            ),
           ),
-          unselectedLabelStyle: const TextStyle(
-            fontFamily: 'Tajawal',
-          ),
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'الرئيسية',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.search),
-              label: 'البحث',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.bookmark),
-              label: 'الحجوزات',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'الملف الشخصي',
-            ),
-          ],
-        ),
+        ],
       ),
     );
   }
@@ -423,21 +428,14 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
             colors: [
-              Colors.teal.shade400,
-              Colors.teal.shade600,
+              Colors.green.shade600,
+              Colors.green.shade800,
             ],
           ),
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.teal.withOpacity(0.3),
-              blurRadius: 15,
-              offset: const Offset(0, 5),
-            ),
-          ],
         ),
         child: Row(
           children: [
@@ -445,60 +443,31 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'دليل السفر',
                     style: TextStyle(
                       fontFamily: 'Amiri',
-                      fontSize: 22,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'اكتشف أجمل الوجهات السياحية في الجزائر مع دليلنا الشامل',
+                    'اكتشف أفضل الأماكن والمعالم السياحية',
                     style: TextStyle(
                       fontFamily: 'Tajawal',
                       fontSize: 14,
                       color: Colors.white.withOpacity(0.9),
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      'استكشف الآن',
-                      style: TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
-            const SizedBox(width: 16),
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Icon(
-                Icons.map,
-                color: Colors.white,
-                size: 40,
-              ),
+            const Icon(
+              Icons.map,
+              color: Colors.white,
+              size: 48,
             ),
           ],
         ),

@@ -701,7 +701,7 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
                 topLeft: Radius.circular(12),
                 topRight: Radius.circular(12),
               ),
-              child: Container(
+              child: SizedBox(
                 height: 100,
                 width: double.infinity,
                 child: guide.imageUrl != null

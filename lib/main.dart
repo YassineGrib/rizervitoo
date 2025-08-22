@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rizervitoo/screens/welcome_screen.dart';
@@ -72,6 +73,23 @@ class _MyAppState extends State<MyApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
+      // Force RTL layout
+      locale: const Locale('ar', 'DZ'), // Arabic (Algeria)
+      supportedLocales: const [
+        Locale('ar', 'DZ'), // Arabic (Algeria)
+        Locale('en', 'US'), // English (fallback)
+      ],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      builder: (context, child) {
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: child!,
+        );
+      },
       home: _isLoading
           ? const Scaffold(
               body: Center(

@@ -162,7 +162,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     
                     // Logo
                     Center(
-                      child: Container(
+                      child: SizedBox(
                         width: 70,
                         height: 70,
                         child: Image.asset(

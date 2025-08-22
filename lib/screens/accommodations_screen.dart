@@ -194,6 +194,7 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
           title: const Text(
             'الإقامات',
             style: TextStyle(
+              fontFamily: 'Amiri',
               fontWeight: FontWeight.bold,
               fontSize: 24,
             ),
@@ -220,7 +221,10 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
                 textDirection: TextDirection.rtl,
                 decoration: InputDecoration(
                   hintText: 'ابحث عن إقامة...',
-                  hintStyle: TextStyle(color: Colors.grey.shade500),
+                  hintStyle: TextStyle(
+                    fontFamily: 'Tajawal',
+                    color: Colors.grey.shade500,
+                  ),
                   prefixIcon: const Icon(Icons.search, color: Color(0xFF3498DB)),
                   filled: true,
                   fillColor: const Color(0xFFF8F9FA),
@@ -281,6 +285,7 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
           Text(
             'لا توجد إقامات متاحة',
             style: TextStyle(
+              fontFamily: 'Amiri',
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: Colors.grey.shade600,
@@ -290,6 +295,7 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
           Text(
             'جرب تغيير معايير البحث أو الفلاتر',
             style: TextStyle(
+              fontFamily: 'Tajawal',
               fontSize: 14,
               color: Colors.grey.shade500,
             ),
@@ -384,6 +390,7 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
                         child: Text(
                           accommodation.title,
                           style: const TextStyle(
+                            fontFamily: 'Amiri',
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF2C3E50),
@@ -404,6 +411,7 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
                         child: Text(
                           accommodation.typeDisplayName,
                           style: const TextStyle(
+                            fontFamily: 'Tajawal',
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                             color: Color(0xFF3498DB),
@@ -428,6 +436,7 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
                         child: Text(
                           '${accommodation.city}, ${accommodation.state}',
                           style: const TextStyle(
+                            fontFamily: 'Tajawal',
                             fontSize: 14,
                             color: Color(0xFF7F8C8D),
                           ),
@@ -444,6 +453,7 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
                   Text(
                     accommodation.guestInfo,
                     style: const TextStyle(
+                      fontFamily: 'Tajawal',
                       fontSize: 14,
                       color: Color(0xFF7F8C8D),
                     ),
@@ -466,6 +476,7 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
                           Text(
                             accommodation.rating.toStringAsFixed(1),
                             style: const TextStyle(
+                              fontFamily: 'Tajawal',
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: Color(0xFF2C3E50),
@@ -475,6 +486,7 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
                           Text(
                             '(${accommodation.totalReviews})',
                             style: const TextStyle(
+                              fontFamily: 'Tajawal',
                               fontSize: 12,
                               color: Color(0xFF7F8C8D),
                             ),
@@ -487,6 +499,7 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
                           Text(
                             accommodation.formattedPrice,
                             style: const TextStyle(
+                              fontFamily: 'Tajawal',
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Color(0xFF27AE60),
@@ -495,6 +508,7 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
                           const Text(
                             'لكل ليلة',
                             style: TextStyle(
+                              fontFamily: 'Tajawal',
                               fontSize: 12,
                               color: Color(0xFF7F8C8D),
                             ),
@@ -567,6 +581,7 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
                   const Text(
                     'الفلاتر',
                     style: TextStyle(
+                      fontFamily: 'Amiri',
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF2C3E50),
@@ -577,6 +592,7 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
                     child: const Text(
                       'مسح الكل',
                       style: TextStyle(
+                        fontFamily: 'Tajawal',
                         color: Color(0xFF3498DB),
                         fontWeight: FontWeight.w600,
                       ),
@@ -596,7 +612,7 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
                     _buildFilterSection(
                       'المدينة',
                       DropdownButtonFormField<String>(
-                        value: _selectedCity,
+                        initialValue: _selectedCity,
                         decoration: _getInputDecoration('اختر المدينة'),
                         items: _cities.map((city) {
                           return DropdownMenuItem(
@@ -616,7 +632,7 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
                     _buildFilterSection(
                       'نوع الإقامة',
                       DropdownButtonFormField<String>(
-                        value: _selectedType,
+                        initialValue: _selectedType,
                         decoration: _getInputDecoration('اختر النوع'),
                         items: _accommodationService.getAccommodationTypes().map((type) {
                           return DropdownMenuItem(
@@ -697,6 +713,7 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
                   child: const Text(
                     'تطبيق الفلاتر',
                     style: TextStyle(
+                      fontFamily: 'Tajawal',
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
@@ -717,6 +734,7 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
         Text(
           title,
           style: const TextStyle(
+            fontFamily: 'Tajawal',
             fontSize: 16,
             fontWeight: FontWeight.w600,
             color: Color(0xFF2C3E50),
@@ -732,7 +750,10 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
   InputDecoration _getInputDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: TextStyle(color: Colors.grey.shade500),
+      hintStyle: TextStyle(
+        fontFamily: 'Tajawal',
+        color: Colors.grey.shade500,
+      ),
       filled: true,
       fillColor: const Color(0xFFF8F9FA),
       border: OutlineInputBorder(

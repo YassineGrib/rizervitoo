@@ -59,6 +59,7 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                               color: Color(0xFF2C3E50),
+                              fontFamily: 'Amiri',
                             ),
                           ),
                         ),
@@ -77,6 +78,7 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: Color(0xFF3498DB),
+                              fontFamily: 'Tajawal',
                             ),
                           ),
                         ),
@@ -113,6 +115,7 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                       style: const TextStyle(
                         fontSize: 14,
                         color: Color(0xFF7F8C8D),
+                        fontFamily: 'Tajawal',
                       ),
                     ),
                     
@@ -202,6 +205,7 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF2C3E50),
+                          fontFamily: 'Amiri',
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -211,6 +215,7 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                           fontSize: 16,
                           color: Color(0xFF7F8C8D),
                           height: 1.5,
+                          fontFamily: 'Tajawal',
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -224,6 +229,7 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF2C3E50),
+                          fontFamily: 'Amiri',
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -249,6 +255,7 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                                 fontSize: 14,
                                 color: Color(0xFF27AE60),
                                 fontWeight: FontWeight.w500,
+                                fontFamily: 'Tajawal',
                               ),
                             ),
                           );
@@ -279,6 +286,7 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFF27AE60),
+                                  fontFamily: 'Tajawal',
                                 ),
                               ),
                               const Text(
@@ -286,6 +294,7 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Color(0xFF7F8C8D),
+                                  fontFamily: 'Tajawal',
                                 ),
                               ),
                             ],
@@ -310,6 +319,7 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
+                                fontFamily: 'Tajawal',
                               ),
                             ),
                           ),
@@ -423,6 +433,7 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: Color(0xFF2C3E50),
+              fontFamily: 'Tajawal',
             ),
           ),
           Text(
@@ -430,6 +441,7 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
             style: const TextStyle(
               fontSize: 12,
               color: Color(0xFF7F8C8D),
+              fontFamily: 'Tajawal',
             ),
           ),
         ],
@@ -438,95 +450,396 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
   }
 
   void _showBookingDialog() {
+    DateTime? checkInDate;
+    DateTime? checkOutDate;
+    int guestCount = 1;
+    
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => Directionality(
+          textDirection: TextDirection.rtl,
+          child: AlertDialog(
+            title: const Text(
+              'حجز الإقامة',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2C3E50),
+                fontFamily: 'Amiri',
+              ),
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'تفاصيل الحجز لـ "${widget.accommodation.title}"',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Color(0xFF7F8C8D),
+                      fontFamily: 'Tajawal',
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  
+                  // Check-in Date
+                  const Text(
+                    'تاريخ الوصول:',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF2C3E50),
+                      fontFamily: 'Tajawal',
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  InkWell(
+                    onTap: () async {
+                      final date = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime.now().add(const Duration(days: 365)),
+                      );
+                      if (date != null) {
+                        setState(() {
+                          checkInDate = date;
+                        });
+                      }
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        checkInDate != null
+                            ? '${checkInDate!.day}/${checkInDate!.month}/${checkInDate!.year}'
+                            : 'اختر تاريخ الوصول',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: checkInDate != null ? const Color(0xFF2C3E50) : const Color(0xFF7F8C8D),
+                          fontFamily: 'Tajawal',
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Check-out Date
+                  const Text(
+                    'تاريخ المغادرة:',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF2C3E50),
+                      fontFamily: 'Tajawal',
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  InkWell(
+                    onTap: () async {
+                      final date = await showDatePicker(
+                        context: context,
+                        initialDate: checkInDate?.add(const Duration(days: 1)) ?? DateTime.now().add(const Duration(days: 1)),
+                        firstDate: checkInDate?.add(const Duration(days: 1)) ?? DateTime.now().add(const Duration(days: 1)),
+                        lastDate: DateTime.now().add(const Duration(days: 365)),
+                      );
+                      if (date != null) {
+                        setState(() {
+                          checkOutDate = date;
+                        });
+                      }
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        checkOutDate != null
+                            ? '${checkOutDate!.day}/${checkOutDate!.month}/${checkOutDate!.year}'
+                            : 'اختر تاريخ المغادرة',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: checkOutDate != null ? const Color(0xFF2C3E50) : const Color(0xFF7F8C8D),
+                          fontFamily: 'Tajawal',
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Guest Count
+                  const Text(
+                    'عدد الضيوف:',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF2C3E50),
+                      fontFamily: 'Tajawal',
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: guestCount > 1 ? () {
+                          setState(() {
+                            guestCount--;
+                          });
+                        } : null,
+                        icon: const Icon(Icons.remove_circle_outline),
+                        color: const Color(0xFF3498DB),
+                      ),
+                      Expanded(
+                        child: Text(
+                          '$guestCount ضيف',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF2C3E50),
+                            fontFamily: 'Tajawal',
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: guestCount < widget.accommodation.maxGuests ? () {
+                          setState(() {
+                            guestCount++;
+                          });
+                        } : null,
+                        icon: const Icon(Icons.add_circle_outline),
+                        color: const Color(0xFF3498DB),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Price Summary
+                  if (checkInDate != null && checkOutDate != null)
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8F9FA),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'عدد الليالي:',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Color(0xFF7F8C8D),
+                                  fontFamily: 'Tajawal',
+                                ),
+                              ),
+                              Text(
+                                '${checkOutDate!.difference(checkInDate!).inDays} ليلة',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF2C3E50),
+                                  fontFamily: 'Tajawal',
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'السعر الإجمالي:',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Color(0xFF7F8C8D),
+                                  fontFamily: 'Tajawal',
+                                ),
+                              ),
+                              Text(
+                                '${(widget.accommodation.pricePerNight * checkOutDate!.difference(checkInDate!).inDays).toStringAsFixed(0)} دج',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF27AE60),
+                                  fontFamily: 'Tajawal',
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text(
+                  'إلغاء',
+                  style: TextStyle(
+                    color: Color(0xFF7F8C8D),
+                    fontFamily: 'Tajawal',
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: (checkInDate != null && checkOutDate != null) ? () {
+                  Navigator.pop(context);
+                  _showBookingConfirmation(checkInDate!, checkOutDate!, guestCount);
+                } : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF3498DB),
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text(
+                  'تأكيد الحجز',
+                  style: TextStyle(
+                    fontFamily: 'Tajawal',
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showBookingConfirmation(DateTime checkIn, DateTime checkOut, int guests) {
+    final nights = checkOut.difference(checkIn).inDays;
+    final totalPrice = widget.accommodation.pricePerNight * nights;
+    
     showDialog(
       context: context,
       builder: (context) => Directionality(
         textDirection: TextDirection.rtl,
         child: AlertDialog(
           title: const Text(
-            'حجز الإقامة',
+            'تأكيد الحجز',
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: Color(0xFF2C3E50),
+              color: Color(0xFF27AE60),
+              fontFamily: 'Amiri',
             ),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'هل تريد حجز "${widget.accommodation.title}"؟',
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Color(0xFF7F8C8D),
+              const Icon(
+                Icons.check_circle,
+                color: Color(0xFF27AE60),
+                size: 48,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'تم إرسال طلب الحجز بنجاح!',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF2C3E50),
+                  fontFamily: 'Amiri',
                 ),
               ),
               const SizedBox(height: 16),
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: const Color(0xFFF8F9FA),
                   borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey.shade200),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'السعر لكل ليلة:',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF7F8C8D),
-                      ),
-                    ),
                     Text(
-                      widget.accommodation.formattedPrice,
+                      'تفاصيل الحجز:',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF27AE60),
+                        color: Color(0xFF2C3E50),
+                        fontFamily: 'Tajawal',
                       ),
                     ),
+                    const SizedBox(height: 12),
+                    _buildBookingDetail('الإقامة:', widget.accommodation.title),
+                    _buildBookingDetail('تاريخ الوصول:', '${checkIn.day}/${checkIn.month}/${checkIn.year}'),
+                    _buildBookingDetail('تاريخ المغادرة:', '${checkOut.day}/${checkOut.month}/${checkOut.year}'),
+                    _buildBookingDetail('عدد الليالي:', '$nights ليلة'),
+                    _buildBookingDetail('عدد الضيوف:', '$guests ضيف'),
+                    const Divider(),
+                    _buildBookingDetail('السعر الإجمالي:', '${totalPrice.toStringAsFixed(0)} دج', isTotal: true),
                   ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'سيتم التواصل معك قريباً لتأكيد الحجز وترتيب تفاصيل الدفع.',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Color(0xFF7F8C8D),
+                  fontFamily: 'Tajawal',
                 ),
               ),
             ],
           ),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text(
-                'إلغاء',
-                style: TextStyle(
-                  color: Color(0xFF7F8C8D),
-                ),
-              ),
-            ),
             ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                _showBookingConfirmation();
-              },
+              onPressed: () => Navigator.pop(context),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF3498DB),
+                backgroundColor: const Color(0xFF27AE60),
                 foregroundColor: Colors.white,
               ),
-              child: const Text('تأكيد الحجز'),
+              child: const Text(
+                'حسناً',
+                style: TextStyle(
+                  fontFamily: 'Tajawal',
+                ),
+              ),
             ),
           ],
         ),
       ),
     );
   }
-
-  void _showBookingConfirmation() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'تم إرسال طلب الحجز بنجاح! سيتم التواصل معك قريباً.',
-          textDirection: TextDirection.rtl,
-        ),
-        backgroundColor: Color(0xFF27AE60),
-        behavior: SnackBarBehavior.floating,
+  
+  Widget _buildBookingDetail(String label, String value, {bool isTotal = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: isTotal ? 16 : 14,
+              fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+              color: const Color(0xFF7F8C8D),
+              fontFamily: 'Tajawal',
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: isTotal ? 16 : 14,
+              fontWeight: isTotal ? FontWeight.bold : FontWeight.w600,
+              color: isTotal ? const Color(0xFF27AE60) : const Color(0xFF2C3E50),
+              fontFamily: 'Tajawal',
+            ),
+          ),
+        ],
       ),
     );
   }
