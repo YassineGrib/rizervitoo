@@ -18,16 +18,71 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   int _selectedIndex = 0;
   final BookingService _bookingService = BookingService();
   List<Booking> _recentBookings = [];
   bool _isLoadingBookings = true;
+  
+  // Animation controllers
+  late AnimationController _taglineController;
+  late Animation<double> _taglineAnimation;
+  
+  // Taglines list
+  final List<String> _taglines = [
+    'اكتشف أجمل الوجهات السياحية في الجزائر',
+    'احجز إقامتك المثالية بسهولة وأمان',
+    'استمتع بتجربة سفر لا تُنسى',
+    'اكتشف كنوز الجزائر الخفية',
+    'رحلتك تبدأ من هنا',
+  ];
+  int _currentTaglineIndex = 0;
 
   @override
   void initState() {
     super.initState();
     _loadRecentBookings();
+    
+    // Initialize animation controller
+    _taglineController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    
+    _taglineAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _taglineController,
+      curve: Curves.easeInOut,
+    ));
+    
+    // Start the animation and tagline rotation
+    _startTaglineRotation();
+  }
+  
+  void _startTaglineRotation() {
+    _taglineController.forward();
+    
+    // Change tagline every 3 seconds
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        _taglineController.reverse().then((_) {
+          if (mounted) {
+            setState(() {
+              _currentTaglineIndex = (_currentTaglineIndex + 1) % _taglines.length;
+            });
+            _startTaglineRotation();
+          }
+        });
+      }
+    });
+  }
+  
+  @override
+  void dispose() {
+    _taglineController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadRecentBookings() async {
@@ -156,35 +211,77 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: _getSelectedScreen(),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: Colors.blue.shade600,
-        unselectedItemColor: Colors.grey.shade600,
-        selectedLabelStyle: AppStyles.buttonTextStyle.copyWith(
-          fontWeight: FontWeight.w600,
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 20,
+              offset: const Offset(0, -5),
+            ),
+          ],
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
         ),
-        unselectedLabelStyle: AppStyles.buttonTextStyle,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'الرئيسية',
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_work),
-            label: 'استضافاتي',
+          child: BottomNavigationBar(
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Colors.transparent,
+            selectedItemColor: AppStyles.primaryColor,
+            unselectedItemColor: Colors.grey.shade500,
+            selectedLabelStyle: AppStyles.buttonTextStyle.copyWith(
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+            ),
+            unselectedLabelStyle: AppStyles.buttonTextStyle.copyWith(
+              fontSize: 11,
+            ),
+            currentIndex: _selectedIndex,
+            onTap: _onItemTapped,
+            elevation: 0,
+            items: [
+              BottomNavigationBarItem(
+                icon: _buildNavIcon(Icons.home_outlined, Icons.home, 0),
+                label: 'الرئيسية',
+              ),
+              BottomNavigationBarItem(
+                icon: _buildNavIcon(Icons.home_work_outlined, Icons.home_work, 1),
+                label: 'استضافاتي',
+              ),
+              BottomNavigationBarItem(
+                icon: _buildNavIcon(Icons.bookmark_border, Icons.bookmark, 2),
+                label: 'الحجوزات',
+              ),
+              BottomNavigationBarItem(
+                icon: _buildNavIcon(Icons.person_outline, Icons.person, 3),
+                label: 'الملف الشخصي',
+              ),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bookmark),
-            label: 'الحجوزات',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'الملف الشخصي',
-          ),
-        ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavIcon(IconData unselectedIcon, IconData selectedIcon, int index) {
+    final isSelected = _selectedIndex == index;
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: isSelected ? AppStyles.primaryColor.withOpacity(0.1) : Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Icon(
+        isSelected ? selectedIcon : unselectedIcon,
+        size: 24,
       ),
     );
   }
@@ -195,45 +292,8 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Welcome Message
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [
-                  Colors.blue.shade600,
-                  Colors.blue.shade800,
-                ],
-              ),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'مرحباً بك في ريزرفيتو',
-                  style: TextStyle(
-                    fontFamily: 'Amiri',
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'اكتشف أجمل الوجهات السياحية في الجزائر',
-                  style: TextStyle(
-                    fontFamily: 'Tajawal',
-                    fontSize: 16,
-                    color: Colors.white.withOpacity(0.9),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          // Welcome Message with Animation
+          _buildAnimatedWelcomeCard(),
           
           const SizedBox(height: 24),
           
@@ -250,51 +310,8 @@ class _HomeScreenState extends State<HomeScreen> {
           
           const SizedBox(height: 16),
           
-          // Quick Action Cards - 3 in a row
-          Row(
-            children: [
-              Expanded(
-                child: _buildQuickActionCard(
-                  icon: Icons.hotel,
-                  title: 'الإقامات',
-                  subtitle: 'احجز إقامتك',
-                  color: Colors.orange,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AccommodationsScreen(),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildQuickActionCard(
-                  icon: Icons.home,
-                  title: 'المنازل',
-                  subtitle: 'استأجر منزل',
-                  color: Colors.green,
-                  onTap: () {
-                    // TODO: Navigate to houses
-                  },
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildQuickActionCard(
-                  icon: Icons.bed,
-                  title: 'المراقد',
-                  subtitle: 'احجز مرقدك',
-                  color: Colors.purple,
-                  onTap: () {
-                    // TODO: Navigate to beds
-                  },
-                ),
-              ),
-            ],
-          ),
+          // Unified Accommodation Card
+          _buildUnifiedAccommodationCard(),
           
           const SizedBox(height: 16),
           
@@ -521,65 +538,308 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Widget _buildQuickActionCard({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
+  Widget _buildAnimatedWelcomeCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [
+            Colors.blue.shade600,
+            Colors.blue.shade800,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blue.withOpacity(0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'مرحباً بك في ريزرفيتو',
+                      style: TextStyle(
+                        fontFamily: 'Amiri',
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    AnimatedBuilder(
+                      animation: _taglineAnimation,
+                      builder: (context, child) {
+                        return Opacity(
+                          opacity: _taglineAnimation.value,
+                          child: Transform.translate(
+                            offset: Offset(0, (1 - _taglineAnimation.value) * 20),
+                            child: Text(
+                              _taglines[_currentTaglineIndex],
+                              style: TextStyle(
+                                fontFamily: 'Tajawal',
+                                fontSize: 16,
+                                color: Colors.white.withOpacity(0.9),
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+           
+              // Container(
+              //   width: 60,
+              //   height: 60,
+              //   decoration: BoxDecoration(
+              //     color: Colors.white.withOpacity(0.2),
+              //     borderRadius: BorderRadius.circular(16),
+              //   ),
+              //   child: const Icon(
+              //     Icons.waving_hand,
+              //     color: Colors.white,
+              //     size: 32,
+              //   ),
+              // ),
+            ],
+          ),
+          // const SizedBox(height: 16),
+         
+          // Row(
+          //   children: [
+          //     Container(
+          //       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          //       decoration: BoxDecoration(
+          //         color: Colors.white.withOpacity(0.2),
+          //         borderRadius: BorderRadius.circular(20),
+          //       ),
+
+          //       child: Row(
+          //         mainAxisSize: MainAxisSize.min,
+          //         children: [
+          //           Icon(
+          //             Icons.location_on,
+          //             color: Colors.white,
+          //             size: 16,
+          //           ),
+          //           const SizedBox(width: 4),
+          //           Text(
+          //             'الجزائر',
+          //             style: TextStyle(
+          //               fontFamily: 'Tajawal',
+          //               fontSize: 12,
+          //               color: Colors.white,
+          //               fontWeight: FontWeight.w500,
+          //             ),
+          //           ),
+          //         ],
+          //       ),
+          //     ),
+          //     const SizedBox(width: 8),
+          //     Container(
+          //       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          //       decoration: BoxDecoration(
+          //         color: Colors.white.withOpacity(0.2),
+          //         borderRadius: BorderRadius.circular(20),
+          //       ),
+          //       child: Row(
+          //         mainAxisSize: MainAxisSize.min,
+          //         children: [
+          //           Icon(
+          //             Icons.star,
+          //             color: Colors.white,
+          //             size: 16,
+          //           ),
+          //           const SizedBox(width: 4),
+          //           Text(
+          //             'أفضل الأسعار',
+          //             style: TextStyle(
+          //               fontFamily: 'Tajawal',
+          //               fontSize: 12,
+          //               color: Colors.white,
+          //               fontWeight: FontWeight.w500,
+          //             ),
+          //           ),
+          //         ],
+          //       ),
+              
+            
+          
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUnifiedAccommodationCard() {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const AccommodationsScreen(),
+          ),
+        );
+      },
       child: Container(
-        padding: const EdgeInsets.all(16),
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.blue.shade600,
+              Colors.blue.shade800,
+            ],
+          ),
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
+              color: Colors.blue.withOpacity(0.3),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
             ),
           ],
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                icon,
-                color: color,
-                size: 24,
-              ),
+            Row(
+              children: [
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Icon(
+                    Icons.home_work,
+                    color: Colors.white,
+                    size: 32,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'جميع أنواع الإقامة',
+                        style: TextStyle(
+                          fontFamily: 'Amiri',
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'اكتشف وأحجز من مجموعة متنوعة من الخيارات',
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 14,
+                          color: Colors.white.withOpacity(0.9),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 12),
-            Text(
-              title,
-              style: TextStyle(
-                fontFamily: 'Tajawal',
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey.shade800,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              subtitle,
-              style: TextStyle(
-                fontFamily: 'Tajawal',
-                fontSize: 12,
-                color: Colors.grey.shade600,
-              ),
-              textAlign: TextAlign.center,
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildAccommodationType(
+                    icon: Icons.hotel,
+                    title: 'الفنادق',
+                    subtitle: 'إقامة فاخرة',
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildAccommodationType(
+                    icon: Icons.home,
+                    title: 'المنازل',
+                    subtitle: 'خصوصية تامة',
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildAccommodationType(
+                    icon: Icons.bed,
+                    title: 'المراقد',
+                    subtitle: 'أسعار مناسبة',
+                  ),
+                ),
+              ],
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildAccommodationType({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          Icon(
+            icon,
+            color: Colors.white,
+            size: 24,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            title,
+            style: const TextStyle(
+              fontFamily: 'Tajawal',
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            subtitle,
+            style: TextStyle(
+              fontFamily: 'Tajawal',
+              fontSize: 10,
+              color: Colors.white.withOpacity(0.8),
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
