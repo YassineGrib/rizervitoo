@@ -6,43 +6,40 @@ import '../models/user.dart' as AppUser;
 class AdminService {
   static final SupabaseClient _supabase = Supabase.instance.client;
   
-  // Admin authentication - Local credentials
+  // Admin authentication - Using Supabase Auth
   static const String adminEmail = 'admin@rizervitoo.dz';
-  static const String adminPassword = 'RizerAdmin2025!';
-  
-  // Track admin login status locally
-  static bool _isAdminLoggedIn = false;
   
   // Check if current user is admin
   static bool isAdmin() {
-    return _isAdminLoggedIn;
+    final user = _supabase.auth.currentUser;
+    return user != null && user.email == adminEmail;
   }
   
-  // Admin login - Local authentication
+  // Admin login - Supabase authentication
   static Future<bool> adminLogin(String email, String password) async {
     try {
-      // Simulate network delay for realistic UX
-      await Future.delayed(const Duration(milliseconds: 500));
-      
       if (email.trim() != adminEmail) {
         throw Exception('غير مصرح لك بالوصول إلى لوحة الإدارة');
       }
       
-      if (password != adminPassword) {
-        throw Exception('كلمة المرور غير صحيحة');
+      final response = await _supabase.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+      
+      if (response.user == null) {
+        throw Exception('فشل في تسجيل الدخول');
       }
       
-      _isAdminLoggedIn = true;
       return true;
     } catch (e) {
-      _isAdminLoggedIn = false;
       throw Exception('فشل في تسجيل الدخول: ${e.toString()}');
     }
   }
   
   // Admin logout
-  static void adminLogout() {
-    _isAdminLoggedIn = false;
+  static Future<void> adminLogout() async {
+    await _supabase.auth.signOut();
   }
   
   // Get dashboard statistics
@@ -55,17 +52,20 @@ class AdminService {
       final guidesResponse = await _supabase.from('travel_guides').select('id, is_published').count(CountOption.exact);
       final publishedGuidesResponse = await _supabase.from('travel_guides').select('id').eq('is_published', true).count(CountOption.exact);
       final usersResponse = await _supabase.from('profiles').select('id').count(CountOption.exact);
+      final accommodationsResponse = await _supabase.from('accommodations').select('id').count(CountOption.exact);
       
       // Get actual counts
       final totalGuides = guidesResponse.count ?? 0;
       final publishedGuides = publishedGuidesResponse.count ?? 0;
       final totalUsers = usersResponse.count ?? 0;
+      final totalAccommodations = accommodationsResponse.count ?? 0;
       
       return {
         'total_guides': totalGuides,
         'published_guides': publishedGuides,
         'draft_guides': totalGuides - publishedGuides,
         'total_users': totalUsers,
+        'total_accommodations': totalAccommodations,
         'active_users': (totalUsers * 0.8).round(), // 80% active
         'new_users_this_month': (totalUsers * 0.2).round(), // 20% new
         'total_bookings': totalUsers * 2, // Mock: 2 bookings per user
@@ -79,6 +79,7 @@ class AdminService {
         'published_guides': 0,
         'draft_guides': 0,
         'total_users': 0,
+        'total_accommodations': 0,
         'active_users': 0,
         'new_users_this_month': 0,
         'total_bookings': 0,
@@ -163,39 +164,51 @@ class AdminService {
   // Get all users
   static Future<List<AppUser.User>> getAllUsers() async {
     try {
-      // Get profiles with user email from auth.users
-      final response = await _supabase
-          .rpc('get_users_with_email')
+      final currentUser = _supabase.auth.currentUser;
+      if (currentUser == null) {
+        throw Exception('يجب تسجيل الدخول أولاً');
+      }
+      
+      if (currentUser.email != adminEmail) {
+        throw Exception('غير مصرح لك بالوصول إلى بيانات المستخدمين - يجب أن تكون مدير');
+      }
+      
+      // Use direct query instead of RPC to avoid permission issues
+      final profilesResponse = await _supabase
+          .from('profiles')
+          .select('*')
           .order('created_at', ascending: false);
       
-      return response.map((userData) => AppUser.User.fromJson(userData)).toList();
-    } catch (e) {
-      // Fallback: get profiles and fetch emails separately
-      try {
-        final profiles = await _supabase
-            .from('profiles')
-            .select('*')
-            .order('created_at', ascending: false);
-        
-        List<AppUser.User> users = [];
-        for (var profile in profiles) {
-          // Try to get user email from auth metadata
-          final user = await _supabase.auth.admin.getUserById(profile['id']);
-          final email = user.user?.email ?? 'unknown@email.com';
+      List<AppUser.User> users = [];
+      for (var profile in profilesResponse) {
+        try {
+          // Try to get user email from auth
+          final authUser = await _supabase.auth.admin.getUserById(profile['id']);
+          final email = authUser.user?.email ?? 'unknown@email.com';
           
           users.add(AppUser.User.fromProfile(profile, email));
+        } catch (e) {
+          // If can't get email, still add user with unknown email
+          users.add(AppUser.User.fromProfile(profile, 'unknown@email.com'));
         }
-        
-        return users;
-      } catch (fallbackError) {
-        throw Exception('فشل في جلب المستخدمين: ${fallbackError.toString()}');
       }
+      
+      return users;
+    } catch (e) {
+      if (e.toString().contains('JWT')) {
+        throw Exception('انتهت صلاحية جلسة المدير - يرجى تسجيل الدخول مرة أخرى');
+      }
+      throw Exception('فشل في جلب المستخدمين: ${e.toString()}');
     }
   }
   
   // Update user profile
   static Future<AppUser.User> updateUserProfile(String id, Map<String, dynamic> profileData) async {
     try {
+      if (!isAdmin()) {
+        throw Exception('غير مصرح لك بتحديث بيانات المستخدمين');
+      }
+      
       final response = await _supabase
           .from('profiles')
           .update(profileData)
@@ -203,11 +216,11 @@ class AdminService {
           .select()
           .single();
       
-      // Get user email
-      final user = await _supabase.auth.admin.getUserById(id);
-      final email = user.user?.email ?? 'unknown@email.com';
+      // Get updated user data using RPC
+      final users = await _supabase.rpc('get_users_with_email');
+      final userData = users.firstWhere((user) => user['id'] == id);
       
-      return AppUser.User.fromProfile(response, email);
+      return AppUser.User.fromJson(userData);
     } catch (e) {
       throw Exception('فشل في تحديث ملف المستخدم: ${e.toString()}');
     }
@@ -216,7 +229,10 @@ class AdminService {
   // Deactivate user
   static Future<void> deactivateUser(String id) async {
     try {
-      // Add is_active column to profiles table if it doesn't exist
+      if (!isAdmin()) {
+        throw Exception('غير مصرح لك بإلغاء تفعيل المستخدمين');
+      }
+      
       await _supabase
           .from('profiles')
           .update({'is_active': false})
@@ -229,6 +245,10 @@ class AdminService {
   // Activate user
   static Future<void> activateUser(String id) async {
     try {
+      if (!isAdmin()) {
+        throw Exception('غير مصرح لك بتفعيل المستخدمين');
+      }
+      
       await _supabase
           .from('profiles')
           .update({'is_active': true})

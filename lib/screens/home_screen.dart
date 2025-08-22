@@ -6,6 +6,7 @@ import 'package:rizervitoo/screens/travel_guides_screen.dart';
 import 'package:rizervitoo/screens/accommodations_screen.dart';
 import 'package:rizervitoo/screens/bookings_screen.dart';
 import 'package:rizervitoo/screens/my_accommodations_screen.dart';
+import 'package:rizervitoo/screens/travel_agencies/travel_agencies_screen.dart';
 import 'package:rizervitoo/services/booking_service.dart';
 import 'package:rizervitoo/models/booking.dart';
 import 'package:rizervitoo/constants/app_styles.dart';
@@ -323,6 +324,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           
           // Travel Guide Card - Full Width
           _buildTravelGuideCard(),
+          
+          const SizedBox(height: 16),
+          
+          // Travel Agencies Card - Full Width
+          _buildTravelAgenciesCard(),
           
           const SizedBox(height: 24),
           
@@ -903,6 +909,68 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
             const Icon(
               Icons.map,
+              color: Colors.white,
+              size: 48,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTravelAgenciesCard() {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const TravelAgenciesScreen(),
+          ),
+        );
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.orange.shade600,
+              Colors.orange.shade800,
+            ],
+          ),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'دليل الوكالات السياحية',
+                    style: TextStyle(
+                      fontFamily: 'Amiri',
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'اكتشف أفضل الوكالات السياحية والعروض المميزة',
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 14,
+                      color: Colors.white.withOpacity(0.9),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.business,
               color: Colors.white,
               size: 48,
             ),

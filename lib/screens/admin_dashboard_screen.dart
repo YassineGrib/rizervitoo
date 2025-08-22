@@ -5,6 +5,7 @@ import '../models/travel_guide.dart';
 import '../models/profile.dart';
 import 'admin_travel_guides_screen.dart';
 import 'admin_users_screen.dart';
+import 'admin/travel_agencies_admin_screen.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -85,7 +86,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
 
     if (confirmed == true && mounted) {
-      AdminService.adminLogout();
+      await AdminService.adminLogout();
       Navigator.of(context).pushReplacementNamed('/');
     }
   }
@@ -423,6 +424,21 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ),
             ),
           ],
+        ),
+        const SizedBox(height: 16),
+        
+        _buildManagementCard(
+          'إدارة الوكالات السياحية',
+          'إضافة وتعديل وحذف الوكالات السياحية والعروض',
+          Icons.business,
+          Colors.orange,
+          () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const TravelAgenciesAdminScreen(),
+              ),
+            );
+          },
         ),
       ],
     );

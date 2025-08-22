@@ -59,6 +59,7 @@ CREATE OR REPLACE FUNCTION public.get_users_with_email()
 RETURNS TABLE (
   id UUID,
   full_name TEXT,
+  email TEXT,
   phone TEXT,
   avatar_url TEXT,
   date_of_birth DATE,
@@ -66,14 +67,23 @@ RETURNS TABLE (
   preferred_language TEXT,
   is_active BOOLEAN,
   created_at TIMESTAMP WITH TIME ZONE,
-  updated_at TIMESTAMP WITH TIME ZONE,
-  email TEXT
+  updated_at TIMESTAMP WITH TIME ZONE
 ) AS $$
 BEGIN
+  -- Check if user is admin
+  IF NOT EXISTS (
+    SELECT 1 FROM auth.users 
+    WHERE auth.users.id = auth.uid() 
+    AND auth.users.email = 'admin@rizervitoo.dz'
+  ) THEN
+    RAISE EXCEPTION 'Access denied. Admin privileges required.';
+  END IF;
+  
   RETURN QUERY
   SELECT 
     p.id,
     p.full_name,
+    COALESCE(au.email, 'unknown@email.com') as email,
     p.phone,
     p.avatar_url,
     p.date_of_birth,
@@ -81,8 +91,7 @@ BEGIN
     p.preferred_language,
     p.is_active,
     p.created_at,
-    p.updated_at,
-    au.email
+    p.updated_at
   FROM public.profiles p
   LEFT JOIN auth.users au ON p.id = au.id
   ORDER BY p.created_at DESC;
