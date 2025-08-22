@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:rizervitoo/screens/sign_up_screen.dart';
 import 'package:rizervitoo/screens/forgot_password_screen.dart';
+import 'package:rizervitoo/screens/home_screen.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -47,8 +48,10 @@ class _SignInScreenState extends State<SignInScreen> {
             backgroundColor: Colors.green,
           ),
         );
-        // Navigate to home screen (to be implemented)
-        Navigator.of(context).pushReplacementNamed('/home');
+        // Navigate to home screen
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
       }
     } on AuthException catch (error) {
       if (mounted) {
