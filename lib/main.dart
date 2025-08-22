@@ -4,6 +4,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rizervitoo/screens/welcome_screen.dart';
 import 'package:rizervitoo/screens/home_screen.dart';
+import 'package:rizervitoo/screens/admin_login_screen.dart';
+import 'package:rizervitoo/screens/admin_dashboard_screen.dart';
+import 'package:rizervitoo/screens/admin_travel_guides_screen.dart';
+import 'package:rizervitoo/screens/admin_travel_guide_form_screen.dart';
+import 'package:rizervitoo/screens/admin_users_screen.dart';
 
 // Get a reference to the Supabase client
 final supabase = Supabase.instance.client;
@@ -90,15 +95,32 @@ class _MyAppState extends State<MyApp> {
           child: child!,
         );
       },
-      home: _isLoading
-          ? const Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(),
-              ),
-            )
-          : _isLoggedIn
-              ? const HomeScreen()
-              : const WelcomeScreen(),
+      routes: {
+        '/': (context) => _isLoading
+            ? const Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              )
+            : _isLoggedIn
+                ? const HomeScreen()
+                : const WelcomeScreen(),
+        '/admin-login': (context) => const AdminLoginScreen(),
+        '/admin-dashboard': (context) => const AdminDashboardScreen(),
+        '/admin-travel-guides': (context) => const AdminTravelGuidesScreen(),
+        '/admin-users': (context) => const AdminUsersScreen(),
+      },
+      onGenerateRoute: (settings) {
+        if (settings.name == '/admin-travel-guide-form') {
+          final args = settings.arguments as Map<String, dynamic>?;
+          return MaterialPageRoute(
+            builder: (context) => AdminTravelGuideFormScreen(
+              guide: args?['guide'],
+            ),
+          );
+        }
+        return null;
+      },
       debugShowCheckedModeBanner: false,
     );
   }

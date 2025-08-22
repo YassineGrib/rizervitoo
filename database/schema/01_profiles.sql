@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   date_of_birth DATE,
   nationality TEXT DEFAULT 'الجزائر',
   preferred_language TEXT DEFAULT 'ar',
+  is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -52,3 +53,60 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER profiles_updated_at
   BEFORE UPDATE ON public.profiles
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+
+-- Create function to get users with email for admin dashboard
+CREATE OR REPLACE FUNCTION public.get_users_with_email()
+RETURNS TABLE (
+  id UUID,
+  full_name TEXT,
+  phone TEXT,
+  avatar_url TEXT,
+  date_of_birth DATE,
+  nationality TEXT,
+  preferred_language TEXT,
+  is_active BOOLEAN,
+  created_at TIMESTAMP WITH TIME ZONE,
+  updated_at TIMESTAMP WITH TIME ZONE,
+  email TEXT
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT 
+    p.id,
+    p.full_name,
+    p.phone,
+    p.avatar_url,
+    p.date_of_birth,
+    p.nationality,
+    p.preferred_language,
+    p.is_active,
+    p.created_at,
+    p.updated_at,
+    au.email
+  FROM public.profiles p
+  LEFT JOIN auth.users au ON p.id = au.id
+  ORDER BY p.created_at DESC;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Grant execute permission to authenticated users (admin only)
+GRANT EXECUTE ON FUNCTION public.get_users_with_email() TO authenticated;
+
+-- Create policy for admin access to user management
+CREATE POLICY "Admin can view all profiles" ON public.profiles
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM auth.users 
+      WHERE auth.users.id = auth.uid() 
+      AND auth.users.email = 'admin@rizervitoo.dz'
+    )
+  );
+
+CREATE POLICY "Admin can update all profiles" ON public.profiles
+  FOR UPDATE USING (
+    EXISTS (
+      SELECT 1 FROM auth.users 
+      WHERE auth.users.id = auth.uid() 
+      AND auth.users.email = 'admin@rizervitoo.dz'
+    )
+  );

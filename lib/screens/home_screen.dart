@@ -159,9 +159,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         automaticallyImplyLeading: false,
         title: Row(
           children: [
-            Image.asset(
-              'assest/images/logo_blue.png',
-              height: 32,
+            GestureDetector(
+              onLongPress: () {
+                // Hidden admin access - long press on logo
+                Navigator.pushNamed(context, '/admin-login');
+              },
+              child: Image.asset(
+                'assest/images/logo_blue.png',
+                height: 32,
+              ),
             ),
             const SizedBox(width: 12),
             Text(

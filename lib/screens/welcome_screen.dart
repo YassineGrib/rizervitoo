@@ -30,12 +30,17 @@ class WelcomeScreen extends StatelessWidget {
                 children: [
                   const Spacer(flex: 2),
                   
-                  // Logo
-                  Image.asset(
-                    'assest/images/logo_black.png',
-                    width: 100,
-                    height: 100,
-                    fit: BoxFit.contain,
+                  // Logo with hidden admin access
+                  GestureDetector(
+                    onLongPress: () {
+                      Navigator.pushNamed(context, '/admin-login');
+                    },
+                    child: Image.asset(
+                      'assest/images/logo_black.png',
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.contain,
+                    ),
                   ),
                   
                   const SizedBox(height: 32),
