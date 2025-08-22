@@ -224,6 +224,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           title: const Text(
             'الملف الشخصي',
             style: AppStyles.appBarTitleStyle,
+            textAlign: TextAlign.center,
           ),
           backgroundColor: AppStyles.primaryColor,
           elevation: 0,

@@ -63,35 +63,77 @@ class _BookingsScreenState extends State<BookingsScreen>
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.grey[50],
-        appBar: AppBar(
-          title: const Text(
-            'الحجوزات',
-            style: AppStyles.appBarTitleStyle,
-          ),
-          backgroundColor: AppStyles.primaryColor,
-          elevation: 0,
-          bottom: TabBar(
-            controller: _tabController,
-            indicatorColor: Colors.white,
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white70,
-            labelStyle: const TextStyle(
-              fontFamily: 'Tajawal',
-              fontWeight: FontWeight.w600,
+        body: Column(
+          children: [
+            // Custom header with title and tabs
+            Container(
+padding: EdgeInsets.only(
+                 top: MediaQuery.of(context).padding.top + 3,
+                 left: 10,
+                 right: 10,
+                 bottom: 0,
+              ),
+              decoration: BoxDecoration(
+                color: AppStyles.primaryColor,
+                // borderRadius: const BorderRadius.only(
+                //   bottomLeft: Radius.circular(24),
+                //   bottomRight: Radius.circular(24),
+                // ),
+              ),
+              child: Column(
+                children: [
+                  // Header with back button and title
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.arrow_back,
+                          color: Colors.white,
+                        ),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                      const Expanded(
+                        child: Text(
+                          'الحجوزات',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: 'Amiri',
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 48), // Balance the back button
+                    ],
+                  ),
+                  // Tab bar
+                  TabBar(
+                    controller: _tabController,
+                    indicatorColor: Colors.white,
+                    labelColor: Colors.white,
+                    unselectedLabelColor: Colors.white70,
+                    labelStyle: const TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontWeight: FontWeight.w600,
+                    ),
+                    tabs: const [
+                      Tab(
+                        // icon: Icon(Icons.person),
+                        text: 'حجوزاتي',
+                      ),
+                      Tab(
+                        // icon: Icon(Icons.home),
+                        text: 'استضافاتي',
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            tabs: const [
-              Tab(
-                icon: Icon(Icons.person),
-                text: 'حجوزاتي',
-              ),
-              Tab(
-                icon: Icon(Icons.home),
-                text: 'استضافاتي',
-              ),
-            ],
-          ),
-        ),
-        body: _isLoading
+            // Content
+             Expanded(
+               child: _isLoading
             ? const Center(
                 child: CircularProgressIndicator(
                   color: Color(0xFF2E7D32),
@@ -106,6 +148,9 @@ class _BookingsScreenState extends State<BookingsScreen>
                       _buildHostBookingsTab(),
                     ],
                   ),
+            ),
+          ],
+        ),
       );
   }
 

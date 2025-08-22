@@ -118,37 +118,69 @@ class _MyAccommodationsScreenState extends State<MyAccommodationsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'استضافاتي',
-          style: AppStyles.appBarTitleStyleDark,
-        ),
-        backgroundColor: Colors.white,
-        foregroundColor: AppStyles.textPrimaryColor,
-        elevation: 1,
-      ),
-      body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : _myAccommodations.isEmpty
-              ? _buildEmptyState()
-              : _buildAccommodationsList(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final result = await Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const AddEditAccommodationScreen(),
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF8F9FA),
+        body: Column(
+          children: [
+            // Custom Header Section
+            Container(
+               padding: EdgeInsets.only(
+                 top: MediaQuery.of(context).padding.top + 3,
+                 left: 10,
+                 right: 10,
+                 bottom: 0,
+               ),
+              decoration: BoxDecoration(
+                color: AppStyles.primaryColor,
+                // borderRadius: const BorderRadius.only(
+                //   bottomLeft: Radius.circular(20),
+                //   bottomRight: Radius.circular(20),
+                // ),
+              ),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  const Expanded(
+                    child: Text(
+                      'استضافاتي',
+                      style: AppStyles.appBarTitleStyle,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.add, color: Colors.white),
+                    onPressed: () async {
+                      final result = await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const AddEditAccommodationScreen(),
+                        ),
+                      );
+                      
+                      if (result == true) {
+                        _loadMyAccommodations(); // Refresh the list
+                      }
+                    },
+                  ),
+                ],
+              ),
             ),
-          );
-          
-          if (result == true) {
-            _loadMyAccommodations(); // Refresh the list
-          }
-        },
-        backgroundColor: Colors.blue.shade600,
-        child: const Icon(Icons.add, color: Colors.white),
+            // Body Content
+            Expanded(
+              child: _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : _myAccommodations.isEmpty
+                      ? _buildEmptyState()
+                      : _buildAccommodationsList(),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -98,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: (_selectedIndex == 1 || _selectedIndex == 2) ? null : AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         automaticallyImplyLeading: false,
@@ -109,9 +109,11 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 32,
             ),
             const SizedBox(width: 12),
-            const Text(
+            Text(
               'ريزرفيتو',
-              style: AppStyles.appBarTitleStyle,
+              style: AppStyles.appBarTitleStyle.copyWith(
+                color: Colors.blue,
+              ),
             ),
           ],
         ),

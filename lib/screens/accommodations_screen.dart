@@ -191,24 +191,48 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         backgroundColor: const Color(0xFFF8F9FA),
-        appBar: AppBar(
-          title: const Text(
-            'الإقامات',
-            style: AppStyles.appBarTitleStyleDark,
-          ),
-          backgroundColor: Colors.white,
-          foregroundColor: AppStyles.textPrimaryColor,
-          elevation: 1,
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(1),
-            child: Container(
-              height: 1,
-              color: Colors.grey.shade200,
-            ),
-          ),
-        ),
         body: Column(
           children: [
+            // Custom header with title
+            Container(
+padding: EdgeInsets.only(
+                 top: MediaQuery.of(context).padding.top + 3,
+                 left: 10,
+                 right: 10,
+                 bottom: 0,
+              ),
+              decoration: BoxDecoration(
+                color: AppStyles.primaryColor,
+                // borderRadius: const BorderRadius.only(
+                //   bottomLeft: Radius.circular(24),
+                //   bottomRight: Radius.circular(24),
+                // ),
+              ),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(
+                      Icons.arrow_back,
+                      color: Colors.white,
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  const Expanded(
+                    child: Text(
+                      'الإقامات',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'Amiri',
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 48), // Balance the back button
+                ],
+              ),
+            ),
             // Search Bar
             Container(
               padding: const EdgeInsets.all(16),
