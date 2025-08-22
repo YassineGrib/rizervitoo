@@ -45,6 +45,22 @@ class ImagePickerService {
     }
   }
 
+  // Pick multiple images from gallery
+  Future<List<File>> pickMultipleImages() async {
+    try {
+      final List<XFile> images = await _picker.pickMultiImage(
+        maxWidth: 800,
+        maxHeight: 800,
+        imageQuality: 85,
+      );
+      
+      return images.map((image) => File(image.path)).toList();
+    } catch (e) {
+      print('Error picking multiple images: $e');
+      return [];
+    }
+  }
+
   // Show image source selection dialog
   Future<File?> showImageSourceDialog(context) async {
     return await showDialog<File?>(

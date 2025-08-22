@@ -5,6 +5,7 @@ import 'package:rizervitoo/screens/profile_screen.dart';
 import 'package:rizervitoo/screens/travel_guides_screen.dart';
 import 'package:rizervitoo/screens/accommodations_screen.dart';
 import 'package:rizervitoo/screens/bookings_screen.dart';
+import 'package:rizervitoo/screens/my_accommodations_screen.dart';
 import 'package:rizervitoo/services/booking_service.dart';
 import 'package:rizervitoo/models/booking.dart';
 import 'package:intl/intl.dart';
@@ -81,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 0:
         return _buildHomeContent();
       case 1:
-        return _buildSearchContent();
+        return _buildMyAccommodationsContent();
       case 2:
         return const BookingsScreen();
       default:
@@ -89,17 +90,8 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Widget _buildSearchContent() {
-    return const Center(
-      child: Text(
-        'البحث قيد التطوير',
-        style: TextStyle(
-          fontFamily: 'Tajawal',
-          fontSize: 18,
-          color: Colors.grey,
-        ),
-      ),
-    );
+  Widget _buildMyAccommodationsContent() {
+    return const MyAccommodationsScreen();
   }
 
   @override
@@ -186,8 +178,8 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'الرئيسية',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'البحث',
+            icon: Icon(Icons.home_work),
+            label: 'استضافاتي',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.bookmark),
