@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:rizervitoo/screens/welcome_screen.dart';
 import 'package:rizervitoo/screens/profile_screen.dart';
+import 'package:rizervitoo/screens/travel_guides_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -404,7 +405,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildTravelGuideCard() {
     return GestureDetector(
       onTap: () {
-        // TODO: Navigate to travel guide
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const TravelGuidesScreen(),
+          ),
+        );
       },
       child: Container(
         width: double.infinity,
