@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:io';
 import '../models/accommodation.dart';
 import '../services/accommodation_service.dart';
 import '../services/image_picker_service.dart';
-import 'dart:io';
+import '../constants/app_styles.dart';
 
 class AddEditAccommodationScreen extends StatefulWidget {
   final Accommodation? accommodation;
@@ -236,13 +237,10 @@ class _AddEditAccommodationScreenState extends State<AddEditAccommodationScreen>
       appBar: AppBar(
         title: Text(
           widget.accommodation != null ? 'تعديل الاستضافة' : 'إضافة استضافة جديدة',
-          style: const TextStyle(
-            fontFamily: 'Tajawal',
-            fontWeight: FontWeight.bold,
-          ),
+          style: AppStyles.appBarTitleStyleDark,
         ),
         backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        foregroundColor: AppStyles.textPrimaryColor,
         elevation: 1,
         actions: [
           if (_isLoading)

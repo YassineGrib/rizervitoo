@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/booking.dart';
 import '../services/booking_service.dart';
+import '../constants/app_styles.dart';
 import 'modify_booking_screen.dart';
 import '../widgets/booking_cancellation_dialog.dart';
 import '../widgets/booking_status_manager.dart';
@@ -65,13 +66,9 @@ class _BookingsScreenState extends State<BookingsScreen>
         appBar: AppBar(
           title: const Text(
             'الحجوزات',
-            style: TextStyle(
-              fontFamily: 'Tajawal',
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+            style: AppStyles.appBarTitleStyle,
           ),
-          backgroundColor: const Color(0xFF2E7D32),
+          backgroundColor: AppStyles.primaryColor,
           elevation: 0,
           bottom: TabBar(
             controller: _tabController,

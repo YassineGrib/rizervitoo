@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/travel_guide.dart';
 import '../services/travel_guide_service.dart';
+import '../constants/app_styles.dart';
 
 class TravelGuideDetailScreen extends StatefulWidget {
   final TravelGuide guide;
@@ -130,7 +131,7 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
     return SliverAppBar(
       expandedHeight: 300,
       pinned: true,
-      backgroundColor: const Color(0xFF2E7D32),
+      backgroundColor: AppStyles.primaryColor,
       leading: Container(
         margin: const EdgeInsets.all(8),
         decoration: BoxDecoration(
@@ -159,12 +160,7 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
         title: _isAppBarCollapsed
             ? Text(
                 widget.guide.title,
-                style: const TextStyle(
-                  fontFamily: 'Amiri',
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+                style: AppStyles.appBarTitleStyle.copyWith(fontSize: 16),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               )
@@ -345,9 +341,7 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
           // Description
           Text(
             widget.guide.description,
-            style: TextStyle(
-              fontFamily: 'Tajawal',
-              fontSize: 16,
+            style: AppStyles.bodyTextStyle.copyWith(
               color: Colors.grey[700],
               height: 1.6,
             ),
@@ -406,10 +400,8 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
           const SizedBox(height: 16),
           Text(
             widget.guide.content,
-            style: const TextStyle(
-              fontFamily: 'Tajawal',
-              fontSize: 16,
-              color: Color(0xFF424242),
+            style: AppStyles.bodyTextStyle.copyWith(
+              color: const Color(0xFF424242),
               height: 1.8,
             ),
             textDirection: TextDirection.rtl,
@@ -560,11 +552,7 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
                     const SizedBox(width: 8),
                     Text(
                       'خط العرض: ${widget.guide.latitude!.toStringAsFixed(6)}',
-                      style: const TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontSize: 14,
-                        color: Colors.grey,
-                      ),
+                      style: AppStyles.subtitleStyle,
                     ),
                   ],
                 ),
@@ -579,11 +567,7 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
                     const SizedBox(width: 8),
                     Text(
                       'خط الطول: ${widget.guide.longitude!.toStringAsFixed(6)}',
-                      style: const TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontSize: 14,
-                        color: Colors.grey,
-                      ),
+                      style: AppStyles.subtitleStyle,
                     ),
                   ],
                 ),

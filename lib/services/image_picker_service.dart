@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import '../constants/app_styles.dart';
 
 class ImagePickerService {
   final ImagePicker _picker = ImagePicker();
@@ -69,11 +70,7 @@ class ImagePickerService {
         return AlertDialog(
           title: const Text(
             'اختر مصدر الصورة',
-            style: TextStyle(
-              fontFamily: 'Amiri',
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: AppStyles.sectionTitleStyle,
             textAlign: TextAlign.center,
           ),
           content: Column(
@@ -83,10 +80,7 @@ class ImagePickerService {
                 leading: const Icon(Icons.photo_library, color: Color(0xFF2E7D32)),
                 title: const Text(
                   'المعرض',
-                  style: TextStyle(
-                    fontFamily: 'Tajawal',
-                    fontSize: 16,
-                  ),
+                  style: AppStyles.bodyTextStyle,
                 ),
                 onTap: () async {
                   Navigator.of(context).pop();
@@ -98,10 +92,7 @@ class ImagePickerService {
                 leading: const Icon(Icons.camera_alt, color: Color(0xFF2E7D32)),
                 title: const Text(
                   'الكاميرا',
-                  style: TextStyle(
-                    fontFamily: 'Tajawal',
-                    fontSize: 16,
-                  ),
+                  style: AppStyles.bodyTextStyle,
                 ),
                 onTap: () async {
                   Navigator.of(context).pop();

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../models/booking.dart';
 import '../models/accommodation.dart';
+import '../models/booking.dart';
 import '../services/booking_service.dart';
+import '../constants/app_styles.dart';
 
 class CreateBookingScreen extends StatefulWidget {
   final Accommodation accommodation;
@@ -43,13 +44,9 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
         appBar: AppBar(
           title: const Text(
             'حجز جديد',
-            style: TextStyle(
-              fontFamily: 'Tajawal',
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+            style: AppStyles.appBarTitleStyle,
           ),
-          backgroundColor: const Color(0xFF2E7D32),
+          backgroundColor: AppStyles.primaryColor,
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -131,10 +128,8 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                 children: [
                   Text(
                     widget.accommodation.title,
-                    style: const TextStyle(
-                      fontFamily: 'Tajawal',
+                    style: AppStyles.sectionTitleStyle.copyWith(
                       fontSize: 18,
-                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -148,9 +143,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                       const SizedBox(width: 4),
                       Text(
                         widget.accommodation.city,
-                        style: TextStyle(
-                          fontFamily: 'Tajawal',
-                          fontSize: 14,
+                        style: AppStyles.subtitleStyle.copyWith(
                           color: Colors.grey[600],
                         ),
                       ),
@@ -159,11 +152,9 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                   const SizedBox(height: 8),
                   Text(
                     '${widget.accommodation.pricePerNight.toStringAsFixed(0)} ${widget.accommodation.currency} / ليلة',
-                    style: const TextStyle(
-                      fontFamily: 'Tajawal',
-                      fontSize: 16,
+                    style: AppStyles.bodyTextStyle.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF2E7D32),
+                      color: const Color(0xFF2E7D32),
                     ),
                   ),
                 ],

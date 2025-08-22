@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/profile.dart';
 import '../services/profile_service.dart';
 import '../services/image_picker_service.dart';
+import '../constants/app_styles.dart';
 import 'sign_in_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -222,14 +223,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         appBar: AppBar(
           title: const Text(
             'الملف الشخصي',
-            style: TextStyle(
-              fontFamily: 'Amiri',
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+            style: AppStyles.appBarTitleStyle,
           ),
-          backgroundColor: const Color(0xFF2E7D32),
+          backgroundColor: AppStyles.primaryColor,
           elevation: 0,
           actions: [
             if (!_isEditing)

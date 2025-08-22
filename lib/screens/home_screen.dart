@@ -8,6 +8,7 @@ import 'package:rizervitoo/screens/bookings_screen.dart';
 import 'package:rizervitoo/screens/my_accommodations_screen.dart';
 import 'package:rizervitoo/services/booking_service.dart';
 import 'package:rizervitoo/models/booking.dart';
+import 'package:rizervitoo/constants/app_styles.dart';
 import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -110,12 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(width: 12),
             const Text(
               'ريزرفيتو',
-              style: TextStyle(
-                fontFamily: 'Amiri',
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
+              style: AppStyles.appBarTitleStyle,
             ),
           ],
         ),
@@ -163,13 +159,10 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.white,
         selectedItemColor: Colors.blue.shade600,
         unselectedItemColor: Colors.grey.shade600,
-        selectedLabelStyle: const TextStyle(
-          fontFamily: 'Tajawal',
+        selectedLabelStyle: AppStyles.buttonTextStyle.copyWith(
           fontWeight: FontWeight.w600,
         ),
-        unselectedLabelStyle: const TextStyle(
-          fontFamily: 'Tajawal',
-        ),
+        unselectedLabelStyle: AppStyles.buttonTextStyle,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: const [

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/accommodation.dart';
 import '../services/accommodation_service.dart';
+import '../constants/app_styles.dart';
 import 'accommodation_detail_screen.dart';
 
 class AccommodationsScreen extends StatefulWidget {
@@ -193,15 +194,11 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
         appBar: AppBar(
           title: const Text(
             'الإقامات',
-            style: TextStyle(
-              fontFamily: 'Amiri',
-              fontWeight: FontWeight.bold,
-              fontSize: 24,
-            ),
+            style: AppStyles.appBarTitleStyleDark,
           ),
           backgroundColor: Colors.white,
-          foregroundColor: const Color(0xFF2C3E50),
-          elevation: 0,
+          foregroundColor: AppStyles.textPrimaryColor,
+          elevation: 1,
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(1),
             child: Container(
@@ -221,8 +218,7 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
                 textDirection: TextDirection.rtl,
                 decoration: InputDecoration(
                   hintText: 'ابحث عن إقامة...',
-                  hintStyle: TextStyle(
-                    fontFamily: 'Tajawal',
+                  hintStyle: AppStyles.subtitleStyle.copyWith(
                     color: Colors.grey.shade500,
                   ),
                   prefixIcon: const Icon(Icons.search, color: Color(0xFF3498DB)),
@@ -389,11 +385,9 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
                       Expanded(
                         child: Text(
                           accommodation.title,
-                          style: const TextStyle(
-                            fontFamily: 'Amiri',
+                          style: AppStyles.sectionTitleStyle.copyWith(
                             fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF2C3E50),
+                            color: const Color(0xFF2C3E50),
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -410,8 +404,7 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
                         ),
                         child: Text(
                           accommodation.typeDisplayName,
-                          style: const TextStyle(
-                            fontFamily: 'Tajawal',
+                          style: AppStyles.subtitleStyle.copyWith(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                             color: Color(0xFF3498DB),

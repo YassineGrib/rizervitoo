@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/travel_guide.dart';
 import '../services/travel_guide_service.dart';
+import '../constants/app_styles.dart';
 import 'travel_guide_detail_screen.dart';
 
 class TravelGuidesScreen extends StatefulWidget {
@@ -233,14 +234,9 @@ class _TravelGuidesScreenState extends State<TravelGuidesScreen>
         appBar: AppBar(
           title: const Text(
             'الأدلة السياحية',
-            style: TextStyle(
-              fontFamily: 'Amiri',
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+            style: AppStyles.appBarTitleStyle,
           ),
-          backgroundColor: const Color(0xFF2E7D32),
+          backgroundColor: AppStyles.primaryColor,
           elevation: 0,
           centerTitle: true,
           bottom: TabBar(
@@ -249,13 +245,12 @@ class _TravelGuidesScreenState extends State<TravelGuidesScreen>
             indicatorWeight: 3,
             labelColor: Colors.white,
             unselectedLabelColor: Colors.white70,
-            labelStyle: const TextStyle(
-              fontFamily: 'Tajawal',
-              fontSize: 16,
+            labelStyle: AppStyles.buttonTextStyle.copyWith(
+              color: Colors.white,
               fontWeight: FontWeight.bold,
             ),
-            unselectedLabelStyle: const TextStyle(
-              fontFamily: 'Tajawal',
+            unselectedLabelStyle: AppStyles.buttonTextStyle.copyWith(
+              color: Colors.white70,
               fontSize: 14,
             ),
             tabs: _tabs.map((tab) => Tab(text: tab)).toList(),
@@ -627,11 +622,8 @@ class _TravelGuidesScreenState extends State<TravelGuidesScreen>
                   // Title
                   Text(
                     guide.title,
-                    style: const TextStyle(
-                      fontFamily: 'Amiri',
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1B5E20),
+                    style: AppStyles.sectionTitleStyle.copyWith(
+                      color: const Color(0xFF1B5E20),
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,

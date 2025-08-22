@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/accommodation.dart';
 import '../services/accommodation_service.dart';
+import '../constants/app_styles.dart';
 import 'add_edit_accommodation_screen.dart';
 
 class MyAccommodationsScreen extends StatefulWidget {
@@ -121,13 +122,10 @@ class _MyAccommodationsScreenState extends State<MyAccommodationsScreen> {
       appBar: AppBar(
         title: const Text(
           'استضافاتي',
-          style: TextStyle(
-            fontFamily: 'Tajawal',
-            fontWeight: FontWeight.bold,
-          ),
+          style: AppStyles.appBarTitleStyleDark,
         ),
         backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        foregroundColor: AppStyles.textPrimaryColor,
         elevation: 1,
       ),
       body: _isLoading

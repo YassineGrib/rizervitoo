@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/booking.dart';
 import '../services/booking_service.dart';
+import '../constants/app_styles.dart';
 
 class ModifyBookingScreen extends StatefulWidget {
   final Booking booking;
@@ -57,13 +58,9 @@ class _ModifyBookingScreenState extends State<ModifyBookingScreen> {
         appBar: AppBar(
           title: const Text(
             'تعديل الحجز',
-            style: TextStyle(
-              fontFamily: 'Tajawal',
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+            style: AppStyles.appBarTitleStyle,
           ),
-          backgroundColor: const Color(0xFF2E7D32),
+          backgroundColor: AppStyles.primaryColor,
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white),
