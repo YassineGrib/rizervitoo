@@ -18,6 +18,10 @@ CREATE TABLE IF NOT EXISTS public.bookings (
   host_notes TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  confirmed_at TIMESTAMP WITH TIME ZONE,
+  checked_in_at TIMESTAMP WITH TIME ZONE,
+  completed_at TIMESTAMP WITH TIME ZONE,
+  cancelled_at TIMESTAMP WITH TIME ZONE,
   
   -- Constraints
   CONSTRAINT check_dates CHECK (check_out_date > check_in_date),

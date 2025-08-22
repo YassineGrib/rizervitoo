@@ -254,7 +254,7 @@ class BookingService {
       await _supabase
           .from('bookings')
           .update({
-            'status': 'checked_in',
+            'status': 'confirmed',
             'checked_in_at': DateTime.now().toIso8601String(),
           })
           .eq('id', bookingId);

@@ -185,7 +185,6 @@ class Booking {
 enum BookingStatus {
   pending('pending', 'في الانتظار'),
   confirmed('confirmed', 'مؤكد'),
-  checkedIn('checked_in', 'تم الوصول'),
   completed('completed', 'مكتمل'),
   cancelled('cancelled', 'ملغي');
 

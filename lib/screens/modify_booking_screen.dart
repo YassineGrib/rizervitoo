@@ -764,8 +764,6 @@ class _ModifyBookingScreenState extends State<ModifyBookingScreen> {
         return Colors.orange;
       case BookingStatus.confirmed:
         return Colors.blue;
-      case BookingStatus.checkedIn:
-        return Colors.green;
       case BookingStatus.completed:
         return Colors.teal;
       case BookingStatus.cancelled:

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/accommodation.dart';
+import '../models/booking.dart';
+import '../services/booking_service.dart';
 
 class AccommodationDetailScreen extends StatefulWidget {
   final Accommodation accommodation;
@@ -15,6 +17,7 @@ class AccommodationDetailScreen extends StatefulWidget {
 
 class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
   final PageController _pageController = PageController();
+  final BookingService _bookingService = BookingService();
   int _currentImageIndex = 0;
 
   @override
@@ -717,37 +720,78 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
     );
   }
 
-  void _showBookingConfirmation(DateTime checkIn, DateTime checkOut, int guests) {
+  void _showBookingConfirmation(DateTime checkIn, DateTime checkOut, int guests) async {
     final nights = checkOut.difference(checkIn).inDays;
     final totalPrice = widget.accommodation.pricePerNight * nights;
     
+    // Show loading dialog
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) => Directionality(
         textDirection: TextDirection.rtl,
-        child: AlertDialog(
-          title: const Text(
-            'تأكيد الحجز',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF27AE60),
-              fontFamily: 'Amiri',
-            ),
-          ),
+        child: const AlertDialog(
           content: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(
-                Icons.check_circle,
-                color: Color(0xFF27AE60),
-                size: 48,
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'تم إرسال طلب الحجز بنجاح!',
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text(
+                'جاري حفظ الحجز...',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontFamily: 'Tajawal',
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    
+    try {
+      // Create booking request
+      final bookingRequest = BookingRequest(
+        accommodationId: widget.accommodation.id,
+        checkInDate: checkIn,
+        checkOutDate: checkOut,
+        guestsCount: guests,
+        pricePerNight: widget.accommodation.pricePerNight,
+      );
+      
+      // Save booking to database
+      await _bookingService.createBooking(bookingRequest);
+      
+      // Close loading dialog
+      Navigator.pop(context);
+      
+      // Show success dialog
+      showDialog(
+        context: context,
+        builder: (context) => Directionality(
+          textDirection: TextDirection.rtl,
+          child: AlertDialog(
+            title: const Text(
+              'تم الحجز بنجاح!',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF27AE60),
+                fontFamily: 'Amiri',
+              ),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(
+                  Icons.check_circle,
+                  color: Color(0xFF27AE60),
+                  size: 48,
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'تم حفظ حجزك بنجاح!',
+                  style: TextStyle(
+                    fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF2C3E50),
                   fontFamily: 'Amiri',
@@ -813,30 +857,94 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
         ),
       ),
     );
+    } catch (e) {
+      // Close loading dialog
+      Navigator.pop(context);
+      
+      // Show error dialog
+      showDialog(
+        context: context,
+        builder: (context) => Directionality(
+          textDirection: TextDirection.rtl,
+          child: AlertDialog(
+            title: const Text(
+              'خطأ في الحجز',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Color(0xFFE74C3C),
+                fontFamily: 'Amiri',
+              ),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.error,
+                  color: Color(0xFFE74C3C),
+                  size: 48,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'حدث خطأ أثناء حفظ الحجز: ${e.toString()}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFF2C3E50),
+                    fontFamily: 'Tajawal',
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFE74C3C),
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text(
+                  'حسناً',
+                  style: TextStyle(
+                    fontFamily: 'Tajawal',
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
   }
   
   Widget _buildBookingDetail(String label, String value, {bool isTotal = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: isTotal ? 16 : 14,
-              fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
-              color: const Color(0xFF7F8C8D),
-              fontFamily: 'Tajawal',
+          Expanded(
+            flex: 2,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: isTotal ? 16 : 14,
+                fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+                color: const Color(0xFF7F8C8D),
+                fontFamily: 'Tajawal',
+              ),
             ),
           ),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: isTotal ? 16 : 14,
-              fontWeight: isTotal ? FontWeight.bold : FontWeight.w600,
-              color: isTotal ? const Color(0xFF27AE60) : const Color(0xFF2C3E50),
-              fontFamily: 'Tajawal',
+          const SizedBox(width: 8),
+          Expanded(
+            flex: 3,
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              style: TextStyle(
+                fontSize: isTotal ? 16 : 14,
+                fontWeight: isTotal ? FontWeight.bold : FontWeight.w600,
+                color: isTotal ? const Color(0xFF27AE60) : const Color(0xFF2C3E50),
+                fontFamily: 'Tajawal',
+              ),
             ),
           ),
         ],

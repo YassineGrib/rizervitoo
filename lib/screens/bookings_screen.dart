@@ -423,10 +423,6 @@ class _BookingsScreenState extends State<BookingsScreen>
         backgroundColor = Colors.green[100]!;
         textColor = Colors.green[800]!;
         break;
-      case BookingStatus.checkedIn:
-        backgroundColor = Colors.blue[100]!;
-        textColor = Colors.blue[800]!;
-        break;
       case BookingStatus.cancelled:
         backgroundColor = Colors.red[100]!;
         textColor = Colors.red[800]!;
@@ -752,8 +748,6 @@ class BookingDetailsSheet extends StatelessWidget {
         return Colors.orange;
       case BookingStatus.confirmed:
         return Colors.green;
-      case BookingStatus.checkedIn:
-        return Colors.blue;
       case BookingStatus.completed:
         return Colors.teal;
       case BookingStatus.cancelled:

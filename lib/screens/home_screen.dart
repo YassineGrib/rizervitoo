@@ -5,6 +5,9 @@ import 'package:rizervitoo/screens/profile_screen.dart';
 import 'package:rizervitoo/screens/travel_guides_screen.dart';
 import 'package:rizervitoo/screens/accommodations_screen.dart';
 import 'package:rizervitoo/screens/bookings_screen.dart';
+import 'package:rizervitoo/services/booking_service.dart';
+import 'package:rizervitoo/models/booking.dart';
+import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,6 +18,29 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
+  final BookingService _bookingService = BookingService();
+  List<Booking> _recentBookings = [];
+  bool _isLoadingBookings = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRecentBookings();
+  }
+
+  Future<void> _loadRecentBookings() async {
+    try {
+      final bookings = await _bookingService.getUserBookings();
+      setState(() {
+        _recentBookings = bookings.take(3).toList(); // Show only 3 recent bookings
+        _isLoadingBookings = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoadingBookings = false;
+      });
+    }
+  }
 
   Future<void> _logout() async {
     try {
@@ -304,43 +330,162 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 16),
           
           // Recent Bookings List
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+          _buildRecentBookingsList(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRecentBookingsList() {
+    if (_isLoadingBookings) {
+      return Container(
+        padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
             ),
+          ],
+        ),
+        child: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (_recentBookings.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Icon(
+              Icons.bookmark_border,
+              size: 48,
+              color: Colors.grey.shade400,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'لا توجد حجوزات حتى الآن',
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                fontSize: 16,
+                color: Colors.grey.shade600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'ابدأ بحجز إقامتك الأولى',
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                fontSize: 14,
+                color: Colors.grey.shade500,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      children: _recentBookings.map((booking) => _buildRecentBookingCard(booking)).toList(),
+    );
+  }
+
+  Widget _buildRecentBookingCard(Booking booking) {
+    final dateFormat = DateFormat('dd/MM/yyyy', 'ar');
+    final totalNights = booking.checkOutDate.difference(booking.checkInDate).inDays;
+    
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: _getStatusColor(booking.status).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              _getStatusIcon(booking.status),
+              color: _getStatusColor(booking.status),
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  Icons.bookmark_border,
-                  size: 48,
-                  color: Colors.grey.shade400,
-                ),
-                const SizedBox(height: 12),
                 Text(
-                  'لا توجد حجوزات حتى الآن',
-                  style: TextStyle(
+                  booking.accommodationTitle ?? 'إقامة غير محددة',
+                  style: const TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 16,
-                    color: Colors.grey.shade600,
+                    fontWeight: FontWeight.bold,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
                 Text(
-                  'ابدأ بحجز إقامتك الأولى',
+                  '${dateFormat.format(booking.checkInDate)} - ${dateFormat.format(booking.checkOutDate)}',
                   style: TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 14,
-                    color: Colors.grey.shade500,
+                    color: Colors.grey.shade600,
                   ),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Text(
+                      _getStatusText(booking.status),
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 12,
+                        color: _getStatusColor(booking.status),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      '${booking.totalAmount.toStringAsFixed(0)} ${booking.currency}',
+                      style: const TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF2E7D32),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -348,6 +493,45 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
     );
+  }
+
+  Color _getStatusColor(BookingStatus status) {
+    switch (status) {
+      case BookingStatus.pending:
+        return Colors.orange;
+      case BookingStatus.confirmed:
+        return Colors.blue;
+      case BookingStatus.completed:
+        return Colors.green;
+      case BookingStatus.cancelled:
+        return Colors.red;
+    }
+  }
+
+  IconData _getStatusIcon(BookingStatus status) {
+    switch (status) {
+      case BookingStatus.pending:
+        return Icons.schedule;
+      case BookingStatus.confirmed:
+        return Icons.check_circle;
+      case BookingStatus.completed:
+        return Icons.task_alt;
+      case BookingStatus.cancelled:
+        return Icons.cancel;
+    }
+  }
+
+  String _getStatusText(BookingStatus status) {
+    switch (status) {
+      case BookingStatus.pending:
+        return 'في الانتظار';
+      case BookingStatus.confirmed:
+        return 'مؤكد';
+      case BookingStatus.completed:
+        return 'مكتمل';
+      case BookingStatus.cancelled:
+        return 'ملغي';
+    }
   }
 
   Widget _buildQuickActionCard({

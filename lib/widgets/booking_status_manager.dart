@@ -177,9 +177,6 @@ class _BookingStatusManagerState extends State<BookingStatusManager> {
             description: 'تسجيل وصول الضيف إلى المكان',
           ));
         }
-        break;
-
-      case BookingStatus.checkedIn:
         // Check if it's check-out time (same day or after check-out date)
         if (now.isAfter(checkOutDate.subtract(const Duration(days: 1)))) {
           actions.add(BookingAction(
@@ -191,6 +188,8 @@ class _BookingStatusManagerState extends State<BookingStatusManager> {
           ));
         }
         break;
+
+
 
       case BookingStatus.completed:
       case BookingStatus.cancelled:
@@ -379,8 +378,7 @@ class _BookingStatusManagerState extends State<BookingStatusManager> {
         return Colors.orange;
       case BookingStatus.confirmed:
         return Colors.blue;
-      case BookingStatus.checkedIn:
-        return Colors.green;
+
       case BookingStatus.completed:
         return Colors.teal;
       case BookingStatus.cancelled:
