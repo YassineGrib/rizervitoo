@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rizervitoo/screens/sign_in_screen.dart';
 import 'package:rizervitoo/screens/sign_up_screen.dart';
+import 'package:rizervitoo/screens/about_us_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -152,13 +153,49 @@ class WelcomeScreen extends StatelessWidget {
                   
                   const Spacer(flex: 1),
                   
-                  // Footer
-                  Text(
-                    'اكتشف الجزائر معنا',
-                    style: TextStyle(
-                      fontFamily: 'Tajawal',
-                      fontSize: 14,
-                      color: Colors.grey.shade500,
+                  // Footer - About Us Button
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AboutUsScreen(),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade50,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.blue.shade200,
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            size: 16,
+                            color: Colors.blue.shade600,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'اكتشف الجزائر معنا',
+                            style: TextStyle(
+                              fontFamily: 'Tajawal',
+                              fontSize: 14,
+                              color: Colors.blue.shade600,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   
