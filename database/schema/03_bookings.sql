@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS public.bookings (
   special_requests TEXT,
   guest_notes TEXT,
   host_notes TEXT,
+  cancellation_reason TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   confirmed_at TIMESTAMP WITH TIME ZONE,

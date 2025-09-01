@@ -60,6 +60,13 @@ switch ($choice) {
             "06_travel_guides.sql"
         )
         
+        # Copy migration files
+        $migrationFiles = @(
+            "001_initial_setup.sql",
+            "002_add_booking_timestamps.sql",
+            "003_add_cancellation_reason.sql"
+        )
+        
         $timestamp = Get-Date -Format "yyyyMMddHHmmss"
         
         foreach ($file in $schemaFiles) {
@@ -71,6 +78,19 @@ switch ($choice) {
                 Write-Host "✓ Copied $file" -ForegroundColor Green
             } else {
                 Write-Host "✗ Schema file not found: $sourcePath" -ForegroundColor Red
+            }
+        }
+        
+        # Copy migration files
+        foreach ($file in $migrationFiles) {
+            $sourcePath = "database/migrations/$file"
+            $destPath = "supabase/migrations/${timestamp}_$file"
+            
+            if (Test-Path $sourcePath) {
+                Copy-Item $sourcePath $destPath
+                Write-Host "✓ Copied migration $file" -ForegroundColor Green
+            } else {
+                Write-Host "✗ Migration file not found: $sourcePath" -ForegroundColor Red
             }
         }
         
@@ -93,7 +113,11 @@ switch ($choice) {
         Write-Host "   - database/schema/04_reviews.sql" -ForegroundColor Gray
         Write-Host "   - database/schema/05_messages.sql" -ForegroundColor Gray
         Write-Host "   - database/schema/06_travel_guides.sql" -ForegroundColor Gray
-        Write-Host "5. Update your Flutter app with Supabase credentials" -ForegroundColor White
+        Write-Host "5. Run migration files:" -ForegroundColor White
+        Write-Host "   - database/migrations/001_initial_setup.sql" -ForegroundColor Gray
+        Write-Host "   - database/migrations/002_add_booking_timestamps.sql" -ForegroundColor Gray
+        Write-Host "   - database/migrations/003_add_cancellation_reason.sql" -ForegroundColor Gray
+        Write-Host "6. Update your Flutter app with Supabase credentials" -ForegroundColor White
         Write-Host ""
         Write-Host "For detailed instructions, see database/README.md" -ForegroundColor Cyan
     }

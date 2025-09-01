@@ -24,11 +24,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final BookingService _bookingService = BookingService();
   List<Booking> _recentBookings = [];
   bool _isLoadingBookings = true;
-  
+
   // Animation controllers
   late AnimationController _taglineController;
   late Animation<double> _taglineAnimation;
-  
+
   // Taglines list
   final List<String> _taglines = [
     'اكتشف أجمل الوجهات السياحية في الجزائر',
@@ -43,35 +43,32 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _loadRecentBookings();
-    
+
     // Initialize animation controller
     _taglineController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-    
-    _taglineAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _taglineController,
-      curve: Curves.easeInOut,
-    ));
-    
+
+    _taglineAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _taglineController, curve: Curves.easeInOut),
+    );
+
     // Start the animation and tagline rotation
     _startTaglineRotation();
   }
-  
+
   void _startTaglineRotation() {
     _taglineController.forward();
-    
+
     // Change tagline every 3 seconds
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
         _taglineController.reverse().then((_) {
           if (mounted) {
             setState(() {
-              _currentTaglineIndex = (_currentTaglineIndex + 1) % _taglines.length;
+              _currentTaglineIndex =
+                  (_currentTaglineIndex + 1) % _taglines.length;
             });
             _startTaglineRotation();
           }
@@ -79,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       }
     });
   }
-  
+
   @override
   void dispose() {
     _taglineController.dispose();
@@ -90,7 +87,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     try {
       final bookings = await _bookingService.getUserBookings();
       setState(() {
-        _recentBookings = bookings.take(3).toList(); // Show only 3 recent bookings
+        _recentBookings = bookings
+            .take(3)
+            .toList(); // Show only 3 recent bookings
         _isLoadingBookings = false;
       });
     } catch (e) {
@@ -124,9 +123,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void _onItemTapped(int index) {
     if (index == 3) {
       // Navigate to profile screen
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => const ProfileScreen()),
-      );
+      Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (context) => const ProfileScreen()));
     } else {
       setState(() {
         _selectedIndex = index;
@@ -154,69 +153,71 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: (_selectedIndex == 1 || _selectedIndex == 2) ? null : AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        title: Row(
-          children: [
-            GestureDetector(
-              onLongPress: () {
-                // Hidden admin access - long press on logo
-                Navigator.pushNamed(context, '/admin-login');
-              },
-              child: Image.asset(
-                'assest/images/logo_blue.png',
-                height: 32,
+      appBar: (_selectedIndex == 1 || _selectedIndex == 2)
+          ? null
+          : AppBar(
+              backgroundColor: Colors.white,
+              elevation: 0,
+              automaticallyImplyLeading: false,
+              title: Row(
+                children: [
+                  GestureDetector(
+                    onLongPress: () {
+                      // Hidden admin access - long press on logo
+                      Navigator.pushNamed(context, '/admin-login');
+                    },
+                    child: Image.asset(
+                      'assest/images/logo_blue.png',
+                      height: 32,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Rizervitoo',
+                    style: AppStyles.appBarTitleStyle.copyWith(
+                      color: Colors.blue,
+                    ),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              'ريزرفيتو',
-              style: AppStyles.appBarTitleStyle.copyWith(
-                color: Colors.blue,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          Stack(
-            children: [
-              IconButton(
-                onPressed: () {
-                  // TODO: Handle notifications
-                },
-                icon: Icon(
-                  Icons.notifications_outlined,
-                  color: Colors.grey.shade700,
-                  size: 24,
+              actions: [
+                Stack(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        // TODO: Handle notifications
+                      },
+                      icon: Icon(
+                        Icons.notifications_outlined,
+                        color: Colors.grey.shade700,
+                        size: 24,
+                      ),
+                    ),
+                    Positioned(
+                      right: 8,
+                      top: 8,
+                      child: Container(
+                        width: 8,
+                        height: 8,
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              Positioned(
-                right: 8,
-                top: 8,
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
+                IconButton(
+                  onPressed: _logout,
+                  icon: Icon(
+                    Icons.logout,
+                    color: Colors.red.shade600,
+                    size: 24,
                   ),
                 ),
-              ),
-            ],
-          ),
-          IconButton(
-            onPressed: _logout,
-            icon: Icon(
-              Icons.logout,
-              color: Colors.red.shade600,
-              size: 24,
+                const SizedBox(width: 8),
+              ],
             ),
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
       body: _getSelectedScreen(),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
@@ -259,7 +260,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 label: 'الرئيسية',
               ),
               BottomNavigationBarItem(
-                icon: _buildNavIcon(Icons.home_work_outlined, Icons.home_work, 1),
+                icon: _buildNavIcon(
+                  Icons.home_work_outlined,
+                  Icons.home_work,
+                  1,
+                ),
                 label: 'استضافاتي',
               ),
               BottomNavigationBarItem(
@@ -277,19 +282,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildNavIcon(IconData unselectedIcon, IconData selectedIcon, int index) {
+  Widget _buildNavIcon(
+    IconData unselectedIcon,
+    IconData selectedIcon,
+    int index,
+  ) {
     final isSelected = _selectedIndex == index;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: isSelected ? AppStyles.primaryColor.withOpacity(0.1) : Colors.transparent,
+        color: isSelected
+            ? AppStyles.primaryColor.withOpacity(0.1)
+            : Colors.transparent,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Icon(
-        isSelected ? selectedIcon : unselectedIcon,
-        size: 24,
-      ),
+      child: Icon(isSelected ? selectedIcon : unselectedIcon, size: 24),
     );
   }
 
@@ -301,9 +309,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         children: [
           // Welcome Message with Animation
           _buildAnimatedWelcomeCard(),
-          
+
           const SizedBox(height: 24),
-          
+
           // Quick Actions Title
           Row(
             children: [
@@ -331,24 +339,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Unified Accommodation Card
           _buildUnifiedAccommodationCard(),
-          
+
           const SizedBox(height: 16),
-          
+
           // Travel Guide Card - Full Width
           _buildTravelGuideCard(),
-          
+
           const SizedBox(height: 16),
-          
+
           // Travel Agencies Card - Full Width
           _buildTravelAgenciesCard(),
-          
+
           const SizedBox(height: 24),
-          
+
           // Recent Bookings Section
           Row(
             children: [
@@ -358,11 +366,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   color: Colors.orange.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(
-                  Icons.history,
-                  color: Colors.orange,
-                  size: 20,
-                ),
+                child: Icon(Icons.history, color: Colors.orange, size: 20),
               ),
               const SizedBox(width: 12),
               Text(
@@ -376,9 +380,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Recent Bookings List
           _buildRecentBookingsList(),
         ],
@@ -401,9 +405,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
           ],
         ),
-        child: const Center(
-          child: CircularProgressIndicator(),
-        ),
+        child: const Center(child: CircularProgressIndicator()),
       );
     }
 
@@ -423,11 +425,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         ),
         child: Column(
           children: [
-            Icon(
-              Icons.bookmark_border,
-              size: 48,
-              color: Colors.grey.shade400,
-            ),
+            Icon(Icons.bookmark_border, size: 48, color: Colors.grey.shade400),
             const SizedBox(height: 12),
             Text(
               'لا توجد حجوزات حتى الآن',
@@ -452,14 +450,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
 
     return Column(
-      children: _recentBookings.map((booking) => _buildRecentBookingCard(booking)).toList(),
+      children: _recentBookings
+          .map((booking) => _buildRecentBookingCard(booking))
+          .toList(),
     );
   }
 
   Widget _buildRecentBookingCard(Booking booking) {
     final dateFormat = DateFormat('dd/MM/yyyy', 'ar');
-    final totalNights = booking.checkOutDate.difference(booking.checkInDate).inDays;
-    
+    final totalNights = booking.checkOutDate
+        .difference(booking.checkInDate)
+        .inDays;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -592,10 +594,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         gradient: LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
-          colors: [
-            Colors.blue.shade600,
-            Colors.blue.shade800,
-          ],
+          colors: [Colors.blue.shade600, Colors.blue.shade800],
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
@@ -616,7 +615,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'مرحباً بك في ريزرفيتو',
+                      'مرحباً بك في Rizervitoo',
                       style: TextStyle(
                         fontFamily: 'Amiri',
                         fontSize: 24,
@@ -631,7 +630,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         return Opacity(
                           opacity: _taglineAnimation.value,
                           child: Transform.translate(
-                            offset: Offset(0, (1 - _taglineAnimation.value) * 20),
+                            offset: Offset(
+                              0,
+                              (1 - _taglineAnimation.value) * 20,
+                            ),
                             child: Text(
                               _taglines[_currentTaglineIndex],
                               style: TextStyle(
@@ -648,7 +650,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ],
                 ),
               ),
-           
               // Container(
               //   width: 60,
               //   height: 60,
@@ -664,8 +665,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               // ),
             ],
           ),
+
           // const SizedBox(height: 16),
-         
+
           // Row(
           //   children: [
           //     Container(
@@ -723,9 +725,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           //           ),
           //         ],
           //       ),
-              
-            
-          
         ],
       ),
     );
@@ -736,9 +735,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => const AccommodationsScreen(),
-          ),
+          MaterialPageRoute(builder: (context) => const AccommodationsScreen()),
         );
       },
       child: Container(
@@ -748,10 +745,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Colors.blue.shade600,
-              Colors.blue.shade800,
-            ],
+            colors: [Colors.blue.shade600, Colors.blue.shade800],
           ),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
@@ -852,18 +846,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.15),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.3),
-          width: 1,
-        ),
+        border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
       ),
       child: Column(
         children: [
-          Icon(
-            icon,
-            color: Colors.white,
-            size: 24,
-          ),
+          Icon(icon, color: Colors.white, size: 24),
           const SizedBox(height: 8),
           Text(
             title,
@@ -895,9 +882,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => const TravelGuidesScreen(),
-          ),
+          MaterialPageRoute(builder: (context) => const TravelGuidesScreen()),
         );
       },
       child: Container(
@@ -907,10 +892,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Colors.green.shade600,
-              Colors.green.shade800,
-            ],
+            colors: [Colors.green.shade600, Colors.green.shade800],
           ),
           borderRadius: BorderRadius.circular(16),
         ),
@@ -941,11 +923,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ],
               ),
             ),
-            const Icon(
-              Icons.map,
-              color: Colors.white,
-              size: 48,
-            ),
+            const Icon(Icons.map, color: Colors.white, size: 48),
           ],
         ),
       ),
@@ -957,9 +935,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => const TravelAgenciesScreen(),
-          ),
+          MaterialPageRoute(builder: (context) => const TravelAgenciesScreen()),
         );
       },
       child: Container(
@@ -969,10 +945,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Colors.orange.shade600,
-              Colors.orange.shade800,
-            ],
+            colors: [Colors.orange.shade600, Colors.orange.shade800],
           ),
           borderRadius: BorderRadius.circular(16),
         ),
@@ -1003,11 +976,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ],
               ),
             ),
-            const Icon(
-              Icons.business,
-              color: Colors.white,
-              size: 48,
-            ),
+            const Icon(Icons.business, color: Colors.white, size: 48),
           ],
         ),
       ),

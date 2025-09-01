@@ -46,16 +46,16 @@ class WelcomeScreen extends StatelessWidget {
                   
                   const SizedBox(height: 32),
                   
-                  // App Name
-                  Text(
-                    'ريزرفيتو',
-                    style: TextStyle(
-                      fontFamily: 'Amiri',
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue.shade800,
-                    ),
-                  ),
+                  // // App Name
+                  // Text(
+                  //   'ريزرفيتو',
+                  //   style: TextStyle(
+                  //     fontFamily: 'Amiri',
+                  //     fontSize: 36,
+                  //     fontWeight: FontWeight.bold,
+                  //     color: Colors.blue.shade800,
+                  //   ),
+                  // ),
                   
                   const SizedBox(height: 16),
                   
