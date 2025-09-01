@@ -7,7 +7,9 @@ import 'package:rizervitoo/screens/accommodations_screen.dart';
 import 'package:rizervitoo/screens/bookings_screen.dart';
 import 'package:rizervitoo/screens/my_accommodations_screen.dart';
 import 'package:rizervitoo/screens/travel_agencies/travel_agencies_screen.dart';
+import 'package:rizervitoo/screens/notifications_screen.dart';
 import 'package:rizervitoo/services/booking_service.dart';
+import 'package:rizervitoo/services/notification_service.dart';
 import 'package:rizervitoo/models/booking.dart';
 import 'package:rizervitoo/constants/app_styles.dart';
 import 'package:intl/intl.dart';
@@ -24,6 +26,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final BookingService _bookingService = BookingService();
   List<Booking> _recentBookings = [];
   bool _isLoadingBookings = true;
+  int _unreadNotificationsCount = 0;
+  final NotificationService _notificationService = NotificationService();
 
   // Animation controllers
   late AnimationController _taglineController;
@@ -43,6 +47,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _loadRecentBookings();
+    _loadUnreadNotificationsCount();
 
     // Initialize animation controller
     _taglineController = AnimationController(
@@ -96,6 +101,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       setState(() {
         _isLoadingBookings = false;
       });
+    }
+  }
+
+  Future<void> _loadUnreadNotificationsCount() async {
+    try {
+      final count = await _notificationService.getUnreadNotificationsCount();
+      setState(() {
+        _unreadNotificationsCount = count;
+      });
+    } catch (e) {
+      // Handle error silently
     }
   }
 
@@ -184,8 +200,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 Stack(
                   children: [
                     IconButton(
-                      onPressed: () {
-                        // TODO: Handle notifications
+                      onPressed: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const NotificationsScreen(),
+                          ),
+                        );
+                        // Reload unread count after returning from notifications screen
+                        _loadUnreadNotificationsCount();
                       },
                       icon: Icon(
                         Icons.notifications_outlined,
@@ -193,18 +216,31 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         size: 24,
                       ),
                     ),
-                    Positioned(
-                      right: 8,
-                      top: 8,
-                      child: Container(
-                        width: 8,
-                        height: 8,
-                        decoration: const BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
+                    if (_unreadNotificationsCount > 0)
+                      Positioned(
+                        right: 8,
+                        top: 8,
+                        child: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: const BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 16,
+                            minHeight: 16,
+                          ),
+                          child: Text(
+                            _unreadNotificationsCount > 99 ? '99+' : _unreadNotificationsCount.toString(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ),
-                    ),
                   ],
                 ),
                 IconButton(

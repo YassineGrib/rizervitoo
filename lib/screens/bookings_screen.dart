@@ -8,7 +8,9 @@ import '../widgets/booking_status_manager.dart';
 import 'package:intl/intl.dart';
 
 class BookingsScreen extends StatefulWidget {
-  const BookingsScreen({super.key});
+  final bool showBackButton;
+  
+  const BookingsScreen({super.key, this.showBackButton = false});
 
   @override
   State<BookingsScreen> createState() => _BookingsScreenState();
@@ -85,15 +87,18 @@ padding: EdgeInsets.only(
                   // Header with back button and title
                   Row(
                     children: [
-                      IconButton(
-                        icon: const Icon(
-                          Icons.arrow_back,
-                          color: Colors.white,
-                        ),
-                        onPressed: () => Navigator.pop(context),
-                      ),
+                      if (widget.showBackButton)
+                        IconButton(
+                          icon: const Icon(
+                            Icons.arrow_back,
+                            color: Colors.white,
+                          ),
+                          onPressed: () => Navigator.pop(context),
+                        )
+                      else
+                        const SizedBox(width: 48), // Space for alignment
                       const Expanded(
-                        child: Text(
+                         child: Text(
                           'الحجوزات',
                           textAlign: TextAlign.center,
                           style: TextStyle(
@@ -104,7 +109,8 @@ padding: EdgeInsets.only(
                           ),
                         ),
                       ),
-                      const SizedBox(width: 48), // Balance the back button
+                      if (!widget.showBackButton)
+                        const SizedBox(width: 48), // Balance when no back button
                     ],
                   ),
                   // Tab bar

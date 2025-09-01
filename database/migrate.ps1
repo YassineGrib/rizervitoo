@@ -57,7 +57,10 @@ switch ($choice) {
             "03_bookings.sql",
             "04_reviews.sql",
             "05_messages.sql",
-            "06_travel_guides.sql"
+            "06_travel_guides.sql",
+            "07_travel_agencies.sql",
+            "08_notifications.sql",
+            "09_notification_triggers.sql"
         )
         
         # Copy migration files
@@ -113,11 +116,18 @@ switch ($choice) {
         Write-Host "   - database/schema/04_reviews.sql" -ForegroundColor Gray
         Write-Host "   - database/schema/05_messages.sql" -ForegroundColor Gray
         Write-Host "   - database/schema/06_travel_guides.sql" -ForegroundColor Gray
+        Write-Host "   - database/schema/07_travel_agencies.sql" -ForegroundColor Gray
+        Write-Host "   - database/schema/08_notifications.sql" -ForegroundColor Gray
+        Write-Host "   - database/schema/09_notification_triggers.sql" -ForegroundColor Gray
         Write-Host "5. Run migration files:" -ForegroundColor White
         Write-Host "   - database/migrations/001_initial_setup.sql" -ForegroundColor Gray
         Write-Host "   - database/migrations/002_add_booking_timestamps.sql" -ForegroundColor Gray
         Write-Host "   - database/migrations/003_add_cancellation_reason.sql" -ForegroundColor Gray
-        Write-Host "6. Update your Flutter app with Supabase credentials" -ForegroundColor White
+        Write-Host "6. (Optional) Add demo data:" -ForegroundColor White
+        Write-Host "   - database/demo_data/accommodations_demo_data.sql" -ForegroundColor Gray
+        Write-Host "   - database/demo_data/travel_agencies_demo_data.sql" -ForegroundColor Gray
+        Write-Host "   - database/demo_data/notifications_demo_data.sql" -ForegroundColor Gray
+        Write-Host "7. Update your Flutter app with Supabase credentials" -ForegroundColor White
         Write-Host ""
         Write-Host "For detailed instructions, see database/README.md" -ForegroundColor Cyan
     }

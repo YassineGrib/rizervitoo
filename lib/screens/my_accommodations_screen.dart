@@ -394,7 +394,7 @@ class _MyAccommodationsScreenState extends State<MyAccommodationsScreen> {
                 Row(
                   children: [
                     Text(
-                      '\$${accommodation.pricePerNight.toStringAsFixed(0)}',
+                      '${accommodation.pricePerNight.toStringAsFixed(0)} دج',
                       style: const TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 16,
