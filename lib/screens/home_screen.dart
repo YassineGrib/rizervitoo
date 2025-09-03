@@ -12,6 +12,8 @@ import 'package:rizervitoo/services/booking_service.dart';
 import 'package:rizervitoo/services/notification_service.dart';
 import 'package:rizervitoo/services/theme_service.dart';
 import 'package:rizervitoo/models/booking.dart';
+import 'package:rizervitoo/models/booking_status.dart';
+import 'package:rizervitoo/models/payment_status.dart';
 import 'package:rizervitoo/constants/app_styles.dart';
 import 'package:intl/intl.dart';
 

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/booking.dart';
+import '../models/booking_status.dart';
+import '../models/payment_status.dart';
 import '../services/booking_service.dart';
 
 class BookingStatusManager extends StatefulWidget {

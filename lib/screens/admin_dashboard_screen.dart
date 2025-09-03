@@ -5,6 +5,7 @@ import '../models/travel_guide.dart';
 import '../models/profile.dart';
 import 'admin_travel_guides_screen.dart';
 import 'admin_users_screen.dart';
+import 'admin_reviews_screen.dart';
 import 'admin/travel_agencies_admin_screen.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
@@ -260,7 +261,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'إدارة شاملة لتطبيق ريزرفيتو',
+                      'إدارة شاملة للتطبيق ',
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.9),
                         fontSize: 14,
@@ -332,6 +333,20 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               subtitle: '${_stats!['active_users']} نشط',
             ),
             _buildStatCard(
+              'التقييمات',
+              _stats!['total_reviews'].toString(),
+              Icons.star_rate,
+              Colors.purple,
+              subtitle: '${_stats!['pending_reviews']} قيد المراجعة',
+            ),
+            _buildStatCard(
+              'التقييمات المقبولة',
+              _stats!['verified_reviews'].toString(),
+              Icons.verified,
+              Colors.green,
+              subtitle: 'تقييمات موثقة',
+            ),
+            _buildStatCard(
               'الوكالات السياحية',
               _stats!['total_agencies'].toString(),
               Icons.business_outlined,
@@ -349,14 +364,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               'الإقامات',
               _stats!['total_accommodations'].toString(),
               Icons.hotel_outlined,
-              Colors.purple,
+              Colors.brown,
               subtitle: 'أماكن إقامة',
             ),
             _buildStatCard(
               'الوكالات النشطة',
               _stats!['active_agencies'].toString(),
               Icons.verified_outlined,
-              Colors.green,
+              Colors.cyan,
               subtitle: '${_stats!['inactive_agencies']} معطلة',
             ),
           ],
@@ -477,7 +492,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           children: [
             Expanded(
               child: _buildManagementCard(
-                'إدارة الأدلة السياحية',
+                ' الأدلة السياحية',
                 Icons.map,
                 Colors.blue,
                 () {
@@ -492,7 +507,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             const SizedBox(width: 18),
             Expanded(
               child: _buildManagementCard(
-                'إدارة المستخدمين',
+                ' المستخدمين',
                 Icons.people,
                 Colors.green,
                 () {
@@ -507,17 +522,37 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           ],
         ),
         const SizedBox(height: 18),
-        
-        _buildManagementCard(
-          'إدارة الوكالات السياحية',
-          Icons.business,
-          Colors.orange,
-          () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const TravelAgenciesAdminScreen(),
+        Row(
+          children: [
+            Expanded(
+              child: _buildManagementCard(
+                ' التقييمات',
+                Icons.star_rate,
+                Colors.purple,
+                () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const AdminReviewsScreen(),
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
+            const SizedBox(width: 18),
+            Expanded(
+              child: _buildManagementCard(
+                ' الوكالات السياحية',
+                Icons.business,
+                Colors.orange,
+                () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const TravelAgenciesAdminScreen(),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );

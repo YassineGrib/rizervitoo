@@ -622,22 +622,24 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'الفلاتر',
                     style: TextStyle(
                       fontFamily: 'Amiri',
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF2C3E50),
+                      color: Theme.of(context).textTheme.headlineSmall?.color,
                     ),
                   ),
                   TextButton(
                     onPressed: _clearFilters,
-                    child: const Text(
+                    child: Text(
                       'مسح الكل',
                       style: TextStyle(
                         fontFamily: 'Tajawal',
-                        color: Color(0xFF3498DB),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? AppStyles.darkPrimaryColor
+                            : AppStyles.primaryColor,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -694,7 +696,8 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
                     
                     // Price Range
                     _buildFilterSection(
-                      'نطاق السعر (دج)',
+                      'نطاق السعر (دج)'
+                      ,
                       Row(
                         children: [
                           Expanded(
@@ -747,7 +750,9 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
                     _applyFilters();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF3498DB),
+                    backgroundColor: Theme.of(context).brightness == Brightness.dark
+                        ? AppStyles.darkPrimaryColor
+                        : AppStyles.primaryColor,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
@@ -777,11 +782,11 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
       children: [
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Tajawal',
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF2C3E50),
+            color: Theme.of(context).textTheme.headlineSmall?.color,
           ),
         ),
         const SizedBox(height: 8),
@@ -796,10 +801,14 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
       hintText: hint,
       hintStyle: TextStyle(
         fontFamily: 'Tajawal',
-        color: Colors.grey.shade500,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.grey.shade400
+            : Colors.grey.shade600,
       ),
       filled: true,
-      fillColor: const Color(0xFFF8F9FA),
+      fillColor: Theme.of(context).brightness == Brightness.dark
+          ? Colors.grey[800]
+          : const Color(0xFFF8F9FA),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide.none,

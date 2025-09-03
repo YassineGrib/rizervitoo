@@ -1,5 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/booking.dart';
+import '../models/booking_request.dart';
+import 'review_service.dart';
 
 class BookingService {
   final SupabaseClient _supabase = Supabase.instance.client;
@@ -23,15 +25,34 @@ class BookingService {
           .eq('guest_id', user.id)
           .order('created_at', ascending: false);
 
-      return (response as List).map((booking) {
-        final accommodationData = booking['accommodations'] as Map<String, dynamic>;
-        return Booking.fromJson({
-          ...booking,
+      final bookings = <Booking>[];
+      
+      for (final bookingData in response) {
+        final accommodationData = bookingData['accommodations'] as Map<String, dynamic>;
+        
+        // For bookings that have passed checkout date, check if user can review
+        bool canReview = false;
+        final checkoutDate = DateTime.parse(bookingData['check_out_date']);
+        final now = DateTime.now();
+        final checkoutDatePassed = checkoutDate.isBefore(now) || 
+                                  checkoutDate.isAtSameMomentAs(DateTime(now.year, now.month, now.day));
+        
+        if (checkoutDatePassed && bookingData['status'] != 'cancelled') {
+          canReview = await ReviewService.canUserReview(bookingData['accommodation_id']);
+        }
+        
+        final booking = Booking.fromJson({
+          ...bookingData,
           'accommodation_title': accommodationData['title'],
           'accommodation_city': accommodationData['city'],
           'accommodation_images': accommodationData['images'],
+          'can_review': canReview,
         });
-      }).toList();
+        
+        bookings.add(booking);
+      }
+      
+      return bookings;
     } catch (e) {
       throw Exception('فشل في جلب الحجوزات: $e');
     }

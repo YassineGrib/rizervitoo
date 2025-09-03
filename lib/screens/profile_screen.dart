@@ -7,6 +7,7 @@ import '../services/image_picker_service.dart';
 import '../services/theme_service.dart';
 import '../constants/app_styles.dart';
 import 'sign_in_screen.dart';
+import 'help_support_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -806,8 +807,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             subtitle: 'اتصل بنا للحصول على المساعدة',
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () {
-              // TODO: Navigate to help/support screen
-              _showComingSoonDialog('المساعدة والدعم');
+              // Navigate to help/support screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const HelpSupportScreen(),
+                ),
+              );
             },
           ),
         ],

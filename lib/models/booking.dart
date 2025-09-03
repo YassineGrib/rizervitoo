@@ -1,3 +1,6 @@
+import 'booking_status.dart';
+import 'payment_status.dart';
+
 class Booking {
   final String id;
   final String guestId;
@@ -28,6 +31,9 @@ class Booking {
   final String? accommodationCity;
   final List<String>? accommodationImages;
 
+  // New property to check if a booking can be reviewed
+  final bool canReview;
+
   const Booking({
     required this.id,
     required this.guestId,
@@ -55,6 +61,7 @@ class Booking {
     this.accommodationTitle,
     this.accommodationCity,
     this.accommodationImages,
+    this.canReview = false,
   });
 
   factory Booking.fromJson(Map<String, dynamic> json) {
@@ -69,8 +76,8 @@ class Booking {
       pricePerNight: (json['price_per_night'] as num).toDouble(),
       totalAmount: (json['total_amount'] as num).toDouble(),
       currency: json['currency'] as String? ?? 'DZD',
-      status: BookingStatus.fromString(json['status'] as String),
-      paymentStatus: PaymentStatus.fromString(json['payment_status'] as String),
+      status: BookingStatusExtension.fromString(json['status'] as String),
+      paymentStatus: PaymentStatusExtension.fromString(json['payment_status'] as String),
       paymentMethod: json['payment_method'] as String?,
       specialRequests: json['special_requests'] as String?,
       guestNotes: json['guest_notes'] as String?,
@@ -82,6 +89,8 @@ class Booking {
       checkedInAt: json['checked_in_at'] != null ? DateTime.parse(json['checked_in_at'] as String) : null,
       completedAt: json['completed_at'] != null ? DateTime.parse(json['completed_at'] as String) : null,
       cancelledAt: json['cancelled_at'] != null ? DateTime.parse(json['cancelled_at'] as String) : null,
+      // Add canReview property from JSON
+      canReview: json['can_review'] as bool? ?? false,
       accommodationTitle: json['accommodation_title'] as String?,
       accommodationCity: json['accommodation_city'] as String?,
       accommodationImages: json['accommodation_images'] != null
@@ -114,6 +123,8 @@ class Booking {
       'checked_in_at': checkedInAt?.toIso8601String(),
       'completed_at': completedAt?.toIso8601String(),
       'cancelled_at': cancelledAt?.toIso8601String(),
+      // Add canReview to JSON
+      'can_review': canReview,
     };
   }
 
@@ -144,6 +155,7 @@ class Booking {
     String? accommodationTitle,
     String? accommodationCity,
     List<String>? accommodationImages,
+    bool? canReview,
   }) {
     return Booking(
       id: id ?? this.id,
@@ -172,87 +184,16 @@ class Booking {
       accommodationTitle: accommodationTitle ?? this.accommodationTitle,
       accommodationCity: accommodationCity ?? this.accommodationCity,
       accommodationImages: accommodationImages ?? this.accommodationImages,
+      // Update canReview value
+      canReview: canReview ?? this.canReview,
     );
   }
 
   bool get canBeCancelled => status == BookingStatus.pending || status == BookingStatus.confirmed;
   bool get canBeModified => status == BookingStatus.pending;
-  bool get isActive => status == BookingStatus.confirmed;
-  bool get isCompleted => status == BookingStatus.completed;
-  bool get isCancelled => status == BookingStatus.cancelled;
-}
 
-enum BookingStatus {
-  pending('pending', 'في الانتظار'),
-  confirmed('confirmed', 'مؤكد'),
-  completed('completed', 'مكتمل'),
-  cancelled('cancelled', 'ملغي');
-
-  const BookingStatus(this.value, this.arabicLabel);
-  final String value;
-  final String arabicLabel;
-
-  static BookingStatus fromString(String value) {
-    return BookingStatus.values.firstWhere(
-      (status) => status.value == value,
-      orElse: () => BookingStatus.pending,
-    );
-  }
-}
-
-enum PaymentStatus {
-  pending('pending', 'معلق'),
-  paid('paid', 'مدفوع'),
-  refunded('refunded', 'مسترد');
-
-  const PaymentStatus(this.value, this.arabicLabel);
-
-  final String value;
-  final String arabicLabel;
-
-  static PaymentStatus fromString(String value) {
-    return PaymentStatus.values.firstWhere(
-      (status) => status.value == value,
-      orElse: () => PaymentStatus.pending,
-    );
-  }
-}
-
-class BookingRequest {
-  final String accommodationId;
-  final DateTime checkInDate;
-  final DateTime checkOutDate;
-  final int guestsCount;
-  final double pricePerNight;
-  final String? specialRequests;
-  final String? guestNotes;
-
-  const BookingRequest({
-    required this.accommodationId,
-    required this.checkInDate,
-    required this.checkOutDate,
-    required this.guestsCount,
-    required this.pricePerNight,
-    this.specialRequests,
-    this.guestNotes,
-  });
-
-  int get totalNights => checkOutDate.difference(checkInDate).inDays;
-  double get totalAmount => pricePerNight * totalNights;
-
-  Map<String, dynamic> toJson() {
-    return {
-      'accommodation_id': accommodationId,
-      'check_in_date': checkInDate.toIso8601String().split('T')[0],
-      'check_out_date': checkOutDate.toIso8601String().split('T')[0],
-      'guests_count': guestsCount,
-      'price_per_night': pricePerNight,
-      'total_amount': totalAmount,
-      'currency': 'DZD',
-      'status': 'pending',
-      'payment_status': 'pending',
-      'special_requests': specialRequests,
-      'guest_notes': guestNotes,
-    };
+  @override
+  String toString() {
+    return 'Booking(id: $id, guestId: $guestId, accommodationId: $accommodationId, checkInDate: $checkInDate, checkOutDate: $checkOutDate, guestsCount: $guestsCount, totalNights: $totalNights, pricePerNight: $pricePerNight, totalAmount: $totalAmount, currency: $currency, status: $status, paymentStatus: $paymentStatus, paymentMethod: $paymentMethod, specialRequests: $specialRequests, guestNotes: $guestNotes, hostNotes: $hostNotes, cancellationReason: $cancellationReason, createdAt: $createdAt, updatedAt: $updatedAt, confirmedAt: $confirmedAt, checkedInAt: $checkedInAt, completedAt: $completedAt, cancelledAt: $cancelledAt, accommodationTitle: $accommodationTitle, accommodationCity: $accommodationCity, accommodationImages: $accommodationImages, canReview: $canReview)';
   }
 }

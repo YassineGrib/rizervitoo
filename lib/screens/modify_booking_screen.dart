@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/booking.dart';
+import '../models/booking_status.dart';
+import '../models/payment_status.dart';
 import '../services/booking_service.dart';
 import '../services/theme_service.dart';
 import '../constants/app_styles.dart';
 
 class ModifyBookingScreen extends StatefulWidget {
   final Booking booking;
+  final VoidCallback? onBookingModified;
 
   const ModifyBookingScreen({
     super.key,
     required this.booking,
+    this.onBookingModified,
   });
 
   @override
@@ -269,9 +273,7 @@ class _ModifyBookingScreenState extends State<ModifyBookingScreen> {
                             style: TextStyle(
                               fontFamily: 'Tajawal',
                               fontSize: 12,
-                              color: canModifyDates
-                                  ? Colors.grey[600]
-                                  : Colors.grey[400],
+                              color: Colors.grey[600],
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -372,7 +374,8 @@ class _ModifyBookingScreenState extends State<ModifyBookingScreen> {
             ),
             SizedBox(width: 12),
             Text(
-              'جاري التحقق من التوفر...',
+              'جاري التحقق من التوفر...'
+              ,
               style: TextStyle(
                 fontFamily: 'Tajawal',
                 color: Colors.blue,
@@ -546,8 +549,8 @@ class _ModifyBookingScreenState extends State<ModifyBookingScreen> {
 
               onChanged: (_) => _checkForChanges(),
               decoration: InputDecoration(
-                hintText: 'أي طلبات خاصة للمضيف...',
-                hintStyle: const TextStyle(fontFamily: 'Tajawal'),
+                hintText: 'أي طلبات خاصة للمضيف...'
+                ,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -590,8 +593,8 @@ class _ModifyBookingScreenState extends State<ModifyBookingScreen> {
     
               onChanged: (_) => _checkForChanges(),
               decoration: InputDecoration(
-                hintText: 'أي ملاحظات أو معلومات إضافية...',
-                hintStyle: const TextStyle(fontFamily: 'Tajawal'),
+                hintText: 'أي ملاحظات أو معلومات إضافية...'
+                ,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -627,7 +630,7 @@ class _ModifyBookingScreenState extends State<ModifyBookingScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'ملخص التكلفة المحدثة',
+              'ملخص التكلفة المحددة',
               style: TextStyle(
                 fontFamily: 'Tajawal',
                 fontSize: 18,
@@ -718,6 +721,8 @@ class _ModifyBookingScreenState extends State<ModifyBookingScreen> {
         return Colors.teal;
       case BookingStatus.cancelled:
         return Colors.red;
+      default:
+        return Colors.grey;
     }
   }
 
@@ -874,6 +879,10 @@ class _ModifyBookingScreenState extends State<ModifyBookingScreen> {
         ),
       );
 
+      if (widget.onBookingModified != null) {
+        widget.onBookingModified!();
+      }
+      
       Navigator.of(context).pop(true); // Return true to indicate success
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -954,100 +963,91 @@ class _ModifyBookingScreenState extends State<ModifyBookingScreen> {
           topRight: Radius.circular(20),
         ),
       ),
-      child: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (_isCheckingAvailability)
-              Container(
-                padding: const EdgeInsets.all(12),
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.orange.withOpacity(0.15)
-                      : Colors.orange.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          Theme.of(context).brightness == Brightness.dark
-                              ? Colors.orange.shade300
-                              : Colors.orange.shade700,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      'جاري التحقق من التوفر...',
-                      style: TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontSize: 14,
-                        color: Theme.of(context).brightness == Brightness.dark
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (_isCheckingAvailability)
+            Container(
+              padding: const EdgeInsets.all(12),
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.orange.withOpacity(0.15)
+                    : Colors.orange.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Theme.of(context).brightness == Brightness.dark
                             ? Colors.orange.shade300
                             : Colors.orange.shade700,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'جاري التحقق من التوفر...'
+                    ,
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 14,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.orange.shade300
+                          : Colors.orange.shade700,
+                    ),
+                  ),
+                ],
               ),
-            if (!_isAvailable && !_isCheckingAvailability && _hasDateChanges())
-              Container(
-                padding: const EdgeInsets.all(12),
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.red.withOpacity(0.15)
-                      : Colors.red.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.error_outline,
+            ),
+          if (!_isAvailable && !_isCheckingAvailability && _hasDateChanges())
+            Container(
+              padding: const EdgeInsets.all(12),
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.red.withOpacity(0.15)
+                    : Colors.red.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.error,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.red.shade300
+                        : Colors.red.shade700,
+                    size: 16,
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'التواريخ المحددة غير متاحة. يرجى اختيار تواريخ أخرى.',
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 14,
                       color: Theme.of(context).brightness == Brightness.dark
                           ? Colors.red.shade300
                           : Colors.red.shade700,
-                      size: 20,
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'التواريخ المحددة غير متاحة',
-                        style: TextStyle(
-                          fontFamily: 'Tajawal',
-                          fontSize: 14,
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.red.shade300
-                              : Colors.red.shade700,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
+            ),
+          if (_hasChanges && _isAvailable || !_isAvailable && _hasDateChanges())
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: (_hasChanges && _isAvailable && !_isLoading && !_isCheckingAvailability)
-                    ? _saveChanges
-                    : null,
+                onPressed: _isLoading ? null : _saveChanges,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).brightness == Brightness.dark
                       ? AppStyles.darkPrimaryColor
                       : AppStyles.primaryColor,
                   foregroundColor: Colors.white,
-                  disabledBackgroundColor: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.grey.shade700
-                      : Colors.grey.shade300,
-                  disabledForegroundColor: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.grey.shade500
-                      : Colors.grey.shade600,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -1055,16 +1055,16 @@ class _ModifyBookingScreenState extends State<ModifyBookingScreen> {
                 ),
                 child: _isLoading
                     ? const SizedBox(
-                        height: 20,
                         width: 20,
+                        height: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
                           valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
                       )
-                    : Text(
-                        _hasChanges ? 'حفظ التعديلات' : 'لا توجد تغييرات',
-                        style: const TextStyle(
+                    : const Text(
+                        'حفظ التغييرات',
+                        style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -1072,9 +1072,158 @@ class _ModifyBookingScreenState extends State<ModifyBookingScreen> {
                       ),
               ),
             ),
-          ],
-        ),
+          if (_hasChanges && _isAvailable || !_isAvailable && _hasDateChanges())
+            const SizedBox(height: 8),
+          if (widget.booking.status == BookingStatus.pending ||
+              widget.booking.status == BookingStatus.confirmed)
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: _showCancelBookingDialog,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.red,
+                  side: BorderSide(
+                    color: Colors.red,
+                    width: 1.5,
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  'إلغاء الحجز',
+                  style: TextStyle(
+                    fontFamily: 'Tajawal',
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
+  }
+
+  void _showCancelBookingDialog() {
+    final reasonController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text(
+          'إلغاء الحجز',
+          style: TextStyle(fontFamily: 'Amiri'),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'يرجى إدخال سبب إلغاء الحجز:',
+              style: const TextStyle(
+                fontFamily: 'Tajawal',
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: reasonController,
+              maxLines: 3,
+              decoration: InputDecoration(
+                hintText: 'سبب الإلغاء...'
+                ,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              style: const TextStyle(fontFamily: 'Tajawal'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: Navigator.of(context).pop,
+            child: const Text(
+              'إلغاء',
+              style: TextStyle(fontFamily: 'Tajawal'),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              if (reasonController.text.trim().isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'يرجى إدخال سبب الإلغاء',
+                      style: TextStyle(fontFamily: 'Tajawal'),
+                    ),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+              
+              _cancelBooking(reasonController.text.trim());
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            child: const Text(
+              'تأكيد الإلغاء',
+              style: TextStyle(fontFamily: 'Tajawal'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _cancelBooking(String reason) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await _bookingService.cancelBooking(widget.booking.id, reason);
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'تم إلغاء الحجز بنجاح!',
+            style: TextStyle(fontFamily: 'Tajawal'),
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+      
+      if (widget.onBookingModified != null) {
+        widget.onBookingModified!();
+      }
+      
+      Navigator.of(context).pop(true); // Return true to indicate success
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'فشل في إلغاء الحجز: $e',
+            style: const TextStyle(fontFamily: 'Tajawal'),
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant ModifyBookingScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.booking.status != widget.booking.status) {
+      _checkForChanges();
+    }
   }
 }

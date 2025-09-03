@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import '../models/booking.dart';
 import '../services/booking_service.dart';
-import '../services/theme_service.dart';
-import '../constants/app_styles.dart';
-import 'modify_booking_screen.dart';
 import '../widgets/booking_cancellation_dialog.dart';
 import '../widgets/booking_status_manager.dart';
-import 'package:intl/intl.dart';
+import '../widgets/add_review_dialog.dart';
+import 'modify_booking_screen.dart';
+import '../models/booking_status.dart';
+import '../models/payment_status.dart';
+import '../constants/app_styles.dart';
+import 'package:intl/intl.dart' show DateFormat;
 
 class BookingsScreen extends StatefulWidget {
   final bool showBackButton;
@@ -70,7 +72,7 @@ class _BookingsScreenState extends State<BookingsScreen>
           children: [
             // Custom header with title and tabs
             Container(
-padding: EdgeInsets.only(
+              padding: EdgeInsets.only(
                  top: MediaQuery.of(context).padding.top + 3,
                  left: 10,
                  right: 10,
@@ -354,7 +356,7 @@ padding: EdgeInsets.only(
                       ],
                     ),
                   ),
-                  _buildStatusChip(booking.status),
+                  _buildStatusChip(context, booking.status),
                 ],
               ),
               const SizedBox(height: 16),
@@ -425,43 +427,7 @@ padding: EdgeInsets.only(
                   onStatusChanged: () => _loadBookings(),
                 )
               else
-                Row(
-                  children: [
-                    if (booking.status == BookingStatus.pending ||
-                        booking.status == BookingStatus.confirmed)
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () => _modifyBooking(booking),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                            foregroundColor: Colors.white,
-                          ),
-                          child: const Text(
-                            'تعديل الحجز',
-                            style: TextStyle(fontFamily: 'Tajawal'),
-                          ),
-                        ),
-                      ),
-                    if (booking.status == BookingStatus.pending ||
-                        booking.status == BookingStatus.confirmed)
-                      const SizedBox(width: 8),
-                    if (booking.status != BookingStatus.cancelled &&
-                        booking.status != BookingStatus.completed)
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () => _cancelBooking(booking),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
-                          ),
-                          child: const Text(
-                            'إلغاء الحجز',
-                            style: TextStyle(fontFamily: 'Tajawal'),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
+                _buildUserBookingActions(booking),
             ],
           ),
         ),
@@ -469,7 +435,94 @@ padding: EdgeInsets.only(
     );
   }
 
-  Widget _buildStatusChip(BookingStatus status) {
+  Widget _buildUserBookingActions(Booking booking) {
+    final now = DateTime.now();
+    final checkoutDatePassed = booking.checkOutDate.isBefore(now) || 
+                               booking.checkOutDate.isAtSameMomentAs(DateTime(now.year, now.month, now.day));
+    
+    // If checkout date has passed, show review button
+    if (checkoutDatePassed) {
+      // Show review button for bookings that have passed checkout date (regardless of status)
+      // but exclude cancelled bookings
+      if (booking.status != BookingStatus.cancelled) {
+        return SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: booking.canReview ? () => _showAddReviewDialog(context, booking) : null,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: booking.canReview 
+                  ? (Theme.of(context).brightness == Brightness.dark
+                      ? AppStyles.darkPrimaryColor
+                      : AppStyles.primaryColor)
+                  : (Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[600]
+                      : Colors.grey[400]),
+              foregroundColor: booking.canReview 
+                  ? Colors.white
+                  : (Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[300]
+                      : Colors.grey[700]),
+            ),
+            child: Text(
+              booking.canReview ? 'أضف تقييم' : 'تم إضافة التقييم',
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                color: booking.canReview 
+                    ? Colors.white
+                    : (Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey[300]
+                        : Colors.grey[700]),
+              ),
+            ),
+          ),
+        );
+      } else {
+        // For cancelled bookings, show no action buttons
+        return const SizedBox.shrink();
+      }
+    }
+    
+    // Before checkout date, show modify and cancel buttons
+    return Row(
+      children: [
+        if (booking.status == BookingStatus.pending ||
+            booking.status == BookingStatus.confirmed)
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () => _modifyBooking(booking),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text(
+                'تعديل الحجز',
+                style: TextStyle(fontFamily: 'Tajawal'),
+              ),
+            ),
+          ),
+        if (booking.status == BookingStatus.pending ||
+            booking.status == BookingStatus.confirmed)
+          const SizedBox(width: 8),
+        if (booking.status != BookingStatus.cancelled &&
+            booking.status != BookingStatus.completed)
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () => _cancelBooking(booking),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text(
+                'إلغاء الحجز',
+                style: TextStyle(fontFamily: 'Tajawal'),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildStatusChip(BuildContext context, BookingStatus status) {
     Color backgroundColor;
     Color textColor;
 
@@ -489,6 +542,10 @@ padding: EdgeInsets.only(
       case BookingStatus.completed:
         backgroundColor = Colors.teal[100]!;
         textColor = Colors.teal[800]!;
+        break;
+      default:
+        backgroundColor = Colors.grey[100]!;
+        textColor = Colors.grey[800]!;
         break;
     }
 
@@ -563,50 +620,81 @@ padding: EdgeInsets.only(
     );
   }
 
+  // Method to handle booking modification
   void _modifyBooking(Booking booking) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ModifyBookingScreen(booking: booking),
+        builder: (context) => ModifyBookingScreen(
+          booking: booking,
+          onBookingModified: _loadBookings,
+        ),
       ),
-    ).then((_) => _loadBookings());
+    );
   }
 
-  void _cancelBooking(Booking booking) async {
-    final result = await showDialog<Map<String, dynamic>>(
+  // Method to handle booking cancellation
+  Future<void> _cancelBooking(Booking booking) async {
+    final shouldCancel = await showDialog(
       context: context,
-      builder: (context) => BookingCancellationDialog(booking: booking),
+      builder: (context) => BookingCancellationDialog(
+        booking: booking,
+      ),
     );
 
-    if (result != null) {
+    if (shouldCancel == true) {
       try {
-        await _bookingService.cancelBooking(
-          booking.id,
-          result['reason'] as String,
-        );
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'تم إلغاء الحجز بنجاح',
-              style: TextStyle(fontFamily: 'Tajawal'),
-            ),
-            backgroundColor: Colors.green,
-          ),
-        );
+        await _bookingService.cancelBooking(booking.id, 'User cancelled booking');
         _loadBookings();
       } catch (e) {
-        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              'فشل في إلغاء الحجز: $e',
-              style: const TextStyle(fontFamily: 'Tajawal'),
-            ),
+            content: Text('Failed to cancel booking: $e'),
             backgroundColor: Colors.red,
           ),
         );
       }
+    }
+  }
+
+  void _showAddReviewDialog(BuildContext context, Booking booking) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => AddReviewDialog(
+        accommodationId: booking.accommodationId,
+        bookingId: booking.id,
+        onReviewAdded: (review) {
+          // Refresh bookings to update review status
+          _loadBookings();
+          // Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'تم إضافة تقييمك بنجاح!',
+                style: const TextStyle(fontFamily: 'Tajawal'),
+              ),
+              backgroundColor: const Color(0xFF27AE60),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Color _getStatusColor(BookingStatus status) {
+    switch (status) {
+      case BookingStatus.pending:
+        return Colors.orange;
+      case BookingStatus.confirmed:
+        return Colors.blue;
+      case BookingStatus.completed:
+        return Colors.teal;
+      case BookingStatus.cancelled:
+        return Colors.red;
+      default:
+        return Colors.grey;
     }
   }
 }
@@ -707,6 +795,31 @@ class BookingDetailsSheet extends StatelessWidget {
                       const Divider(height: 32),
                       _buildDetailItem('ملاحظات المضيف', booking.hostNotes!),
                     ],
+                    if (!isHost && booking.status == BookingStatus.completed && booking.canReview)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20),
+                        child: ElevatedButton(
+                          onPressed: () => _showAddReviewDialog(context, booking),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).brightness == Brightness.dark
+                                ? AppStyles.darkPrimaryColor
+                                : AppStyles.primaryColor,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text(
+                            'أضف تقييم',
+                            style: TextStyle(
+                              fontFamily: 'Tajawal',
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -714,6 +827,32 @@ class BookingDetailsSheet extends StatelessWidget {
           ],
         ),
       );
+  }
+
+  void _showAddReviewDialog(BuildContext context, Booking booking) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => AddReviewDialog(
+        accommodationId: booking.accommodationId,
+        bookingId: booking.id,
+        onReviewAdded: (review) {
+          // Refresh bookings to update review status
+          onBookingUpdated();
+          // Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'تم إضافة تقييمك بنجاح!',
+                style: const TextStyle(fontFamily: 'Tajawal'),
+              ),
+              backgroundColor: const Color(0xFF27AE60),
+            ),
+          );
+        },
+      ),
+    );
   }
 
   Widget _buildDetailItem(String label, String value) {
@@ -806,11 +945,13 @@ class BookingDetailsSheet extends StatelessWidget {
       case BookingStatus.pending:
         return Colors.orange;
       case BookingStatus.confirmed:
-        return Colors.green;
+        return Colors.blue;
       case BookingStatus.completed:
         return Colors.teal;
       case BookingStatus.cancelled:
         return Colors.red;
+      default:
+        return Colors.grey;
     }
   }
 }

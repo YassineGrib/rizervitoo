@@ -2,6 +2,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/travel_guide.dart';
 import '../models/profile.dart';
 import '../models/user.dart' as AppUser;
+import '../models/review.dart';
 
 class AdminService {
   static final SupabaseClient _supabase = Supabase.instance.client;
@@ -60,6 +61,9 @@ class AdminService {
       final verifiedAgenciesResponse = await _supabase.from('travel_agencies').select('id').eq('is_active', true).eq('is_verified', true).count(CountOption.exact);
       final agencyOffersResponse = await _supabase.from('travel_agency_offers').select('id').eq('is_active', true).count(CountOption.exact);
       
+      // Get review statistics
+      final reviewStats = await getReviewStats();
+      
       // Get actual counts
       final totalGuides = guidesResponse.count ?? 0;
       final publishedGuides = publishedGuidesResponse.count ?? 0;
@@ -86,6 +90,10 @@ class AdminService {
         'new_users_this_month': (totalUsers * 0.2).round(), // 20% new
         'total_bookings': totalUsers * 2, // Mock: 2 bookings per user
         'revenue': totalUsers * 150.0, // Mock: $150 per user
+        // Review statistics
+        'total_reviews': reviewStats['total_reviews'],
+        'pending_reviews': reviewStats['pending_reviews'],
+        'verified_reviews': reviewStats['verified_reviews'],
       };
     } catch (e) {
       print('Error fetching dashboard stats: $e');
@@ -106,6 +114,9 @@ class AdminService {
         'new_users_this_month': 0,
         'total_bookings': 0,
         'revenue': 0.0,
+        'total_reviews': 0,
+        'pending_reviews': 0,
+        'verified_reviews': 0,
       };
     }
   }
@@ -333,6 +344,155 @@ class AdminService {
       return users;
     } catch (e) {
       throw Exception('فشل في البحث عن المستخدمين: ${e.toString()}');
+    }
+  }
+
+  // Review Management Operations
+  
+  // Get pending reviews (not verified)
+  static Future<List<Review>> getPendingReviews() async {
+    try {
+      print('Debug: AdminService.getPendingReviews() called');
+      
+      // Check if user is admin
+      final currentUser = _supabase.auth.currentUser;
+      print('Debug: Current user: ${currentUser?.email}');
+      print('Debug: Is admin: ${isAdmin()}');
+      
+      final response = await _supabase
+          .from('reviews')
+          .select('''
+            *,
+            profiles!reviews_guest_id_fkey(
+              full_name,
+              avatar_url
+            ),
+            accommodations!reviews_accommodation_id_fkey(
+              title
+            )
+          ''')
+          .eq('is_verified', false)
+          .order('created_at', ascending: false);
+
+      print('Debug: Raw response from Supabase: $response');
+      print('Debug: Response length: ${response.length}');
+
+      final reviews = (response as List).map((json) {
+        final profile = json['profiles'];
+        final accommodation = json['accommodations'];
+        
+        print('Debug: Processing review: ${json['id']}, is_verified: ${json['is_verified']}');
+        
+        return Review.fromJson({
+          ...json,
+          'guest_name': profile?['full_name'],
+          'guest_avatar': profile?['avatar_url'],
+          'accommodation_title': accommodation?['title'],
+        });
+      }).toList();
+      
+      print('Debug: Returning ${reviews.length} pending reviews');
+      return reviews;
+    } catch (e) {
+      print('Debug: Error in getPendingReviews: $e');
+      throw Exception('فشل في جلب التقييمات قيد المراجعة: ${e.toString()}');
+    }
+  }
+
+  // Get verified reviews
+  static Future<List<Review>> getVerifiedReviews() async {
+    try {
+      final response = await _supabase
+          .from('reviews')
+          .select('''
+            *,
+            profiles!reviews_guest_id_fkey(
+              full_name,
+              avatar_url
+            ),
+            accommodations!reviews_accommodation_id_fkey(
+              title
+            )
+          ''')
+          .eq('is_verified', true)
+          .order('created_at', ascending: false)
+          .limit(50); // Limit to recent 50 verified reviews
+
+      return (response as List).map((json) {
+        final profile = json['profiles'];
+        final accommodation = json['accommodations'];
+        
+        return Review.fromJson({
+          ...json,
+          'guest_name': profile?['full_name'],
+          'guest_avatar': profile?['avatar_url'],
+          'accommodation_title': accommodation?['title'],
+        });
+      }).toList();
+    } catch (e) {
+      throw Exception('فشل في جلب التقييمات المقبولة: ${e.toString()}');
+    }
+  }
+
+  // Approve a review (set is_verified to true)
+  static Future<void> approveReview(String reviewId) async {
+    try {
+      await _supabase
+          .from('reviews')
+          .update({'is_verified': true})
+          .eq('id', reviewId);
+    } catch (e) {
+      throw Exception('فشل في قبول التقييم: ${e.toString()}');
+    }
+  }
+
+  // Reject a review (delete it)
+  static Future<void> rejectReview(String reviewId) async {
+    try {
+      await _supabase
+          .from('reviews')
+          .delete()
+          .eq('id', reviewId);
+    } catch (e) {
+      throw Exception('فشل في رفض التقييم: ${e.toString()}');
+    }
+  }
+
+  // Get review statistics for admin dashboard
+  static Future<Map<String, dynamic>> getReviewStats() async {
+    try {
+      final totalReviewsResponse = await _supabase
+          .from('reviews')
+          .select('id')
+          .count(CountOption.exact);
+          
+      final pendingReviewsResponse = await _supabase
+          .from('reviews')
+          .select('id')
+          .eq('is_verified', false)
+          .count(CountOption.exact);
+          
+      final verifiedReviewsResponse = await _supabase
+          .from('reviews')
+          .select('id')
+          .eq('is_verified', true)
+          .count(CountOption.exact);
+
+      final totalReviews = totalReviewsResponse.count ?? 0;
+      final pendingReviews = pendingReviewsResponse.count ?? 0;
+      final verifiedReviews = verifiedReviewsResponse.count ?? 0;
+
+      return {
+        'total_reviews': totalReviews,
+        'pending_reviews': pendingReviews,
+        'verified_reviews': verifiedReviews,
+      };
+    } catch (e) {
+      return {
+        'total_reviews': 0,
+        'pending_reviews': 0,
+        'verified_reviews': 0,
+      };
     }
   }
 }
