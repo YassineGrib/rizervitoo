@@ -129,6 +129,12 @@ class AdminService {
   // Create travel guide
   static Future<TravelGuide> createTravelGuide(Map<String, dynamic> guideData) async {
     try {
+      // Add the current user as creator
+      final currentUser = _supabase.auth.currentUser;
+      if (currentUser != null) {
+        guideData['created_by'] = currentUser.id;
+      }
+      
       final response = await _supabase
           .from('travel_guides')
           .insert(guideData)

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/booking.dart';
 import '../services/booking_service.dart';
+import '../services/theme_service.dart';
 import '../constants/app_styles.dart';
 
 class ModifyBookingScreen extends StatefulWidget {
@@ -54,13 +55,20 @@ class _ModifyBookingScreenState extends State<ModifyBookingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.grey[50],
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
-          title: const Text(
+          title: Text(
             'تعديل الحجز',
-            style: AppStyles.appBarTitleStyle,
+            style: TextStyle(
+              fontFamily: 'Amiri',
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
-          backgroundColor: AppStyles.primaryColor,
+          backgroundColor: Theme.of(context).brightness == Brightness.dark
+              ? AppStyles.darkPrimaryColor
+              : AppStyles.primaryColor,
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -700,61 +708,6 @@ class _ModifyBookingScreenState extends State<ModifyBookingScreen> {
     );
   }
 
-  Widget _buildBottomBar() {
-    final canSave = _hasChanges &&
-        _checkInDate != null &&
-        _checkOutDate != null &&
-        (_isAvailable || !_hasDateChanges()) &&
-        !_isCheckingAvailability;
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        child: SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: canSave && !_isLoading ? _saveChanges : null,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF2E7D32),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: _isLoading
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                : const Text(
-                    'حفظ التغييرات',
-                    style: TextStyle(
-                      fontFamily: 'Tajawal',
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Color _getStatusColor(BookingStatus status) {
     switch (status) {
       case BookingStatus.pending:
@@ -980,5 +933,148 @@ class _ModifyBookingScreenState extends State<ModifyBookingScreen> {
     } else {
       Navigator.of(context).pop();
     }
+  }
+
+  Widget _buildBottomBar() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.black.withOpacity(0.4)
+                : Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+      child: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (_isCheckingAvailability)
+              Container(
+                padding: const EdgeInsets.all(12),
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.orange.withOpacity(0.15)
+                      : Colors.orange.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Theme.of(context).brightness == Brightness.dark
+                              ? Colors.orange.shade300
+                              : Colors.orange.shade700,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'جاري التحقق من التوفر...',
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 14,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.orange.shade300
+                            : Colors.orange.shade700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            if (!_isAvailable && !_isCheckingAvailability && _hasDateChanges())
+              Container(
+                padding: const EdgeInsets.all(12),
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.red.withOpacity(0.15)
+                      : Colors.red.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.red.shade300
+                          : Colors.red.shade700,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'التواريخ المحددة غير متاحة',
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 14,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.red.shade300
+                              : Colors.red.shade700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: (_hasChanges && _isAvailable && !_isLoading && !_isCheckingAvailability)
+                    ? _saveChanges
+                    : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).brightness == Brightness.dark
+                      ? AppStyles.darkPrimaryColor
+                      : AppStyles.primaryColor,
+                  foregroundColor: Colors.white,
+                  disabledBackgroundColor: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey.shade700
+                      : Colors.grey.shade300,
+                  disabledForegroundColor: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey.shade500
+                      : Colors.grey.shade600,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: _isLoading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : Text(
+                        _hasChanges ? 'حفظ التعديلات' : 'لا توجد تغييرات',
+                        style: const TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

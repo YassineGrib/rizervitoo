@@ -9,6 +9,8 @@ import 'package:rizervitoo/screens/admin_dashboard_screen.dart';
 import 'package:rizervitoo/screens/admin_travel_guides_screen.dart';
 import 'package:rizervitoo/screens/admin_travel_guide_form_screen.dart';
 import 'package:rizervitoo/screens/admin_users_screen.dart';
+import 'package:rizervitoo/services/theme_service.dart';
+import 'package:rizervitoo/constants/app_styles.dart';
 
 // Get a reference to the Supabase client
 final supabase = Supabase.instance.client;
@@ -20,6 +22,9 @@ void main() async {
     url: 'https://zmleqfnqkdgsbaftfmau.supabase.co',
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InptbGVxZm5xa2Rnc2JhZnRmbWF1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU4MDMyMDcsImV4cCI6MjA3MTM3OTIwN30.3qx5-CfiI9WzJujpnB2J_RKTvpI-o47Zp9E03nItqAQ',
   );
+  
+  // Initialize theme service
+  await themeService.initialize();
   
   runApp(const MyApp());
 }
@@ -72,56 +77,60 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Rizervitoo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
-      // Force RTL layout
-      locale: const Locale('ar', 'DZ'), // Arabic (Algeria)
-      supportedLocales: const [
-        Locale('ar', 'DZ'), // Arabic (Algeria)
-        Locale('en', 'US'), // English (fallback)
-      ],
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      builder: (context, child) {
-        return Directionality(
-          textDirection: TextDirection.rtl,
-          child: child!,
+    return AnimatedBuilder(
+      animation: themeService,
+      builder: (context, _) {
+        return MaterialApp(
+          title: 'Rizervitoo',
+          theme: AppStyles.lightTheme,
+          darkTheme: AppStyles.darkTheme,
+          themeMode: themeService.themeMode,
+          // Force RTL layout
+          locale: const Locale('ar', 'DZ'), // Arabic (Algeria)
+          supportedLocales: const [
+            Locale('ar', 'DZ'), // Arabic (Algeria)
+            Locale('en', 'US'), // English (fallback)
+          ],
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          builder: (context, child) {
+            return Directionality(
+              textDirection: TextDirection.rtl,
+              child: child!,
+            );
+          },
+          routes: {
+            '/': (context) => _isLoading
+                ? const Scaffold(
+                    body: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  )
+                : _isLoggedIn
+                    ? const HomeScreen()
+                    : const WelcomeScreen(),
+            '/admin-login': (context) => const AdminLoginScreen(),
+            '/admin-dashboard': (context) => const AdminDashboardScreen(),
+            '/admin-travel-guides': (context) => const AdminTravelGuidesScreen(),
+            '/admin-users': (context) => const AdminUsersScreen(),
+          },
+          onGenerateRoute: (settings) {
+            if (settings.name == '/admin-travel-guide-form') {
+              final args = settings.arguments as Map<String, dynamic>?;
+              return MaterialPageRoute(
+                builder: (context) => AdminTravelGuideFormScreen(
+                  guide: args?['guide'],
+                ),
+              );
+            }
+            return null;
+          },
+          debugShowCheckedModeBanner: false,
         );
       },
-      routes: {
-        '/': (context) => _isLoading
-            ? const Scaffold(
-                body: Center(
-                  child: CircularProgressIndicator(),
-                ),
-              )
-            : _isLoggedIn
-                ? const HomeScreen()
-                : const WelcomeScreen(),
-        '/admin-login': (context) => const AdminLoginScreen(),
-        '/admin-dashboard': (context) => const AdminDashboardScreen(),
-        '/admin-travel-guides': (context) => const AdminTravelGuidesScreen(),
-        '/admin-users': (context) => const AdminUsersScreen(),
-      },
-      onGenerateRoute: (settings) {
-        if (settings.name == '/admin-travel-guide-form') {
-          final args = settings.arguments as Map<String, dynamic>?;
-          return MaterialPageRoute(
-            builder: (context) => AdminTravelGuideFormScreen(
-              guide: args?['guide'],
-            ),
-          );
-        }
-        return null;
-      },
-      debugShowCheckedModeBanner: false,
     );
   }
 }

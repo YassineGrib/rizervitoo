@@ -4,6 +4,7 @@ import 'dart:io';
 import '../models/accommodation.dart';
 import '../services/accommodation_service.dart';
 import '../services/image_picker_service.dart';
+import '../services/theme_service.dart';
 import '../constants/app_styles.dart';
 
 class AddEditAccommodationScreen extends StatefulWidget {
@@ -61,6 +62,8 @@ class _AddEditAccommodationScreenState extends State<AddEditAccommodationScreen>
     {'key': 'studio', 'label': 'استوديو'},
     {'key': 'room', 'label': 'غرفة'},
     {'key': 'hotel', 'label': 'فندق'},
+    {'key': 'guesthouse', 'label': 'بيت ضيافة'},
+    {'key': 'hostel', 'label': 'نزل'},
   ];
 
   @override
@@ -234,13 +237,22 @@ class _AddEditAccommodationScreenState extends State<AddEditAccommodationScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
           widget.accommodation != null ? 'تعديل الاستضافة' : 'إضافة استضافة جديدة',
-          style: AppStyles.appBarTitleStyleDark,
+          style: TextStyle(
+            fontFamily: 'Tajawal',
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? AppStyles.darkTextPrimaryColor
+                : AppStyles.textPrimaryColor,
+          ),
         ),
-        backgroundColor: Colors.white,
-        foregroundColor: AppStyles.textPrimaryColor,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        foregroundColor: Theme.of(context).brightness == Brightness.dark
+            ? AppStyles.darkTextPrimaryColor
+            : AppStyles.textPrimaryColor,
         elevation: 1,
         actions: [
           if (_isLoading)
@@ -257,11 +269,14 @@ class _AddEditAccommodationScreenState extends State<AddEditAccommodationScreen>
           else
             TextButton(
               onPressed: _saveAccommodation,
-              child: const Text(
+              child: Text(
                 'حفظ',
                 style: TextStyle(
                   fontFamily: 'Tajawal',
                   fontWeight: FontWeight.bold,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? AppStyles.darkPrimaryColor
+                      : AppStyles.primaryColor,
                 ),
               ),
             ),
@@ -292,17 +307,19 @@ class _AddEditAccommodationScreenState extends State<AddEditAccommodationScreen>
 
   Widget _buildBasicInfoSection() {
     return Card(
+      color: Theme.of(context).cardColor,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'المعلومات الأساسية',
               style: TextStyle(
                 fontFamily: 'Tajawal',
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                color: Theme.of(context).textTheme.headlineSmall?.color,
               ),
             ),
             const SizedBox(height: 16),

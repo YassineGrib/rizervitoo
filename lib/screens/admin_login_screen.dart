@@ -73,7 +73,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -85,11 +85,13 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).cardColor,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.blue.withOpacity(0.1),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.black.withOpacity(0.3)
+                            : Colors.blue.withOpacity(0.1),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
@@ -108,7 +110,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Colors.grey[800],
+                    color: Theme.of(context).textTheme.headlineLarge?.color,
                     fontFamily: 'Amiri',
                   ),
                 ),
@@ -118,7 +120,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   'تسجيل دخول المدير العام',
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.grey[600],
+                    color: Theme.of(context).textTheme.bodyMedium?.color,
                     fontFamily: 'Tajawal',
                   ),
                 ),
@@ -129,11 +131,13 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   constraints: const BoxConstraints(maxWidth: 400),
                   padding: const EdgeInsets.all(32),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.black.withOpacity(0.3)
+                            : Colors.black.withOpacity(0.1),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
@@ -165,7 +169,9 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                               borderSide: BorderSide(color: AppStyles.primaryColor),
                             ),
                             filled: true,
-                            fillColor: Colors.grey[50],
+                            fillColor: Theme.of(context).brightness == Brightness.dark
+                                ? Theme.of(context).cardColor
+                                : Colors.grey[50],
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -210,7 +216,9 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                               borderSide: BorderSide(color: AppStyles.primaryColor),
                             ),
                             filled: true,
-                            fillColor: Colors.grey[50],
+                            fillColor: Theme.of(context).brightness == Brightness.dark
+                                ? Theme.of(context).cardColor
+                                : Colors.grey[50],
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/notification.dart';
 import '../services/notification_service.dart';
+import '../services/theme_service.dart';
 import '../constants/app_styles.dart';
 
 class NotificationsScreen extends StatefulWidget {
@@ -157,17 +158,19 @@ class _NotificationsScreenState extends State<NotificationsScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppStyles.backgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text(
           'الإشعارات',
           style: TextStyle(
             fontFamily: 'Tajawal',
             fontWeight: FontWeight.bold,
-            color: Colors.white,
           ),
         ),
-        backgroundColor: AppStyles.primaryColor,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? AppStyles.darkPrimaryColor
+            : AppStyles.primaryColor,
+        foregroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
@@ -233,9 +236,13 @@ class _NotificationsScreenState extends State<NotificationsScreen>
         ),
       ),
       body: _isLoading
-          ? const Center(
+          ? Center(
               child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(AppStyles.primaryColor),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  Theme.of(context).brightness == Brightness.dark
+                      ? AppStyles.darkPrimaryColor
+                      : AppStyles.primaryColor,
+                ),
               ),
             )
           : _error != null
@@ -258,14 +265,16 @@ class _NotificationsScreenState extends State<NotificationsScreen>
           Icon(
             Icons.error_outline,
             size: 64,
-            color: Colors.grey[400],
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[600]
+                : Colors.grey[400],
           ),
           const SizedBox(height: 16),
           Text(
             'حدث خطأ في تحميل الإشعارات',
             style: TextStyle(
               fontSize: 18,
-              color: Colors.grey[600],
+              color: Theme.of(context).textTheme.bodyLarge?.color,
               fontFamily: 'Tajawal',
             ),
           ),
@@ -274,7 +283,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
             _error!,
             style: TextStyle(
               fontSize: 14,
-              color: Colors.grey[500],
+              color: Theme.of(context).textTheme.bodyMedium?.color,
               fontFamily: 'Tajawal',
             ),
             textAlign: TextAlign.center,
@@ -283,7 +292,9 @@ class _NotificationsScreenState extends State<NotificationsScreen>
           ElevatedButton(
             onPressed: _loadNotifications,
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppStyles.primaryColor,
+              backgroundColor: Theme.of(context).brightness == Brightness.dark
+                  ? AppStyles.darkPrimaryColor
+                  : AppStyles.primaryColor,
               foregroundColor: Colors.white,
             ),
             child: const Text(
@@ -303,7 +314,9 @@ class _NotificationsScreenState extends State<NotificationsScreen>
 
     return RefreshIndicator(
       onRefresh: _loadNotifications,
-      color: AppStyles.primaryColor,
+      color: Theme.of(context).brightness == Brightness.dark
+          ? AppStyles.darkPrimaryColor
+          : AppStyles.primaryColor,
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: notifications.length,
@@ -323,14 +336,16 @@ class _NotificationsScreenState extends State<NotificationsScreen>
           Icon(
             Icons.notifications_none,
             size: 64,
-            color: Colors.grey[400],
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[600]
+                : Colors.grey[400],
           ),
           const SizedBox(height: 16),
           Text(
             'لا توجد إشعارات',
             style: TextStyle(
               fontSize: 18,
-              color: Colors.grey[600],
+              color: Theme.of(context).textTheme.bodyLarge?.color,
               fontFamily: 'Tajawal',
             ),
           ),
@@ -339,7 +354,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
             'ستظهر إشعاراتك هنا عند وصولها',
             style: TextStyle(
               fontSize: 14,
-              color: Colors.grey[500],
+              color: Theme.of(context).textTheme.bodyMedium?.color,
               fontFamily: 'Tajawal',
             ),
           ),
@@ -352,11 +367,13 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.black.withOpacity(0.3)
+                : Colors.black.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -409,8 +426,8 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                                     ? FontWeight.normal
                                     : FontWeight.bold,
                                 color: notification.isRead
-                                    ? Colors.grey[700]
-                                    : Colors.black87,
+                                    ? Theme.of(context).textTheme.bodyMedium?.color
+                                    : Theme.of(context).textTheme.headlineSmall?.color,
                                 fontFamily: 'Tajawal',
                               ),
                             ),
@@ -444,8 +461,8 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                         style: TextStyle(
                           fontSize: 14,
                           color: notification.isRead
-                              ? Colors.grey[600]
-                              : Colors.grey[700],
+                              ? Theme.of(context).textTheme.bodySmall?.color
+                              : Theme.of(context).textTheme.bodyMedium?.color,
                           fontFamily: 'Tajawal',
                         ),
                         maxLines: 3,
@@ -480,7 +497,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                             notification.timeAgo,
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.grey[500],
+                              color: Theme.of(context).textTheme.bodySmall?.color,
                               fontFamily: 'Tajawal',
                             ),
                           ),
@@ -493,7 +510,9 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                 PopupMenuButton<String>(
                   icon: Icon(
                     Icons.more_vert,
-                    color: Colors.grey[400],
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey[600]
+                        : Colors.grey[400],
                     size: 20,
                   ),
                   onSelected: (value) {

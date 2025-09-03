@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:share_plus/share_plus.dart';
 import '../models/travel_guide.dart';
 import '../services/travel_guide_service.dart';
 import '../constants/app_styles.dart';
@@ -95,13 +98,16 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
+        backgroundColor: isDark ? Colors.grey[900] : Colors.grey[50],
         body: CustomScrollView(
           controller: _scrollController,
           slivers: [
-            _buildSliverAppBar(),
+            _buildSliverAppBar(context, isDark),
             SliverToBoxAdapter(
               child: FadeTransition(
                 opacity: _fadeAnimation,
@@ -110,11 +116,12 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildHeader(),
-                      _buildContent(),
-                      _buildTags(),
-                      _buildLocationInfo(),
-                      _buildRelatedGuides(),
+                      _buildHeader(context, isDark),
+                      _buildContent(context, isDark),
+                      _buildTags(context, isDark),
+                      _buildAdditionalInfo(context, isDark),
+                      _buildLocationInfo(context, isDark),
+                      _buildRelatedGuides(context, isDark),
                       const SizedBox(height: 32),
                     ],
                   ),
@@ -127,20 +134,24 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
     );
   }
 
-  Widget _buildSliverAppBar() {
+  Widget _buildSliverAppBar(BuildContext context, bool isDark) {
     return SliverAppBar(
       expandedHeight: 300,
       pinned: true,
-      backgroundColor: AppStyles.primaryColor,
+      backgroundColor: isDark ? AppStyles.darkPrimaryColor : AppStyles.primaryColor,
       leading: Container(
         margin: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: Colors.black.withOpacity(0.3),
           shape: BoxShape.circle,
         ),
-        child: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(20),
+            onTap: () => Navigator.pop(context),
+            child: const Icon(Icons.arrow_back, color: Colors.white),
+          ),
         ),
       ),
       actions: [
@@ -150,9 +161,16 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
             color: Colors.black.withOpacity(0.3),
             shape: BoxShape.circle,
           ),
-          child: IconButton(
-            icon: const Icon(Icons.share, color: Colors.white),
-            onPressed: _shareGuide,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(20),
+              onTap: _shareGuide,
+              child: const Padding(
+                padding: EdgeInsets.all(8),
+                child: Icon(Icons.share, color: Colors.white),
+              ),
+            ),
           ),
         ),
       ],
@@ -160,7 +178,10 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
         title: _isAppBarCollapsed
             ? Text(
                 widget.guide.title,
-                style: AppStyles.appBarTitleStyle.copyWith(fontSize: 16),
+                style: AppStyles.appBarTitleStyle.copyWith(
+                  fontSize: 16,
+                  color: Colors.white,
+                ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               )
@@ -168,15 +189,15 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
         background: Stack(
           fit: StackFit.expand,
           children: [
-            widget.guide.imageUrl != null
+            widget.guide.primaryImageUrl.isNotEmpty
                 ? Image.network(
-                    widget.guide.imageUrl!,
+                    widget.guide.primaryImageUrl,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
-                      return _buildPlaceholderImage();
+                      return _buildPlaceholderImage(isDark);
                     },
                   )
-                : _buildPlaceholderImage(),
+                : _buildPlaceholderImage(isDark),
             // Gradient overlay
             Container(
               decoration: BoxDecoration(
@@ -200,8 +221,11 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF2E7D32), Color(0xFF388E3C)],
+                  gradient: LinearGradient(
+                    colors: [
+                      isDark ? AppStyles.darkPrimaryColor : const Color(0xFF2E7D32),
+                      isDark ? AppStyles.darkPrimaryColor.withOpacity(0.8) : const Color(0xFF388E3C),
+                    ],
                   ),
                   borderRadius: BorderRadius.circular(25),
                   boxShadow: [
@@ -229,15 +253,15 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
     );
   }
 
-  Widget _buildPlaceholderImage() {
+  Widget _buildPlaceholderImage(bool isDark) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            const Color(0xFF2E7D32).withOpacity(0.3),
-            const Color(0xFF2E7D32).withOpacity(0.7),
+            (isDark ? AppStyles.darkPrimaryColor : const Color(0xFF2E7D32)).withOpacity(0.3),
+            (isDark ? AppStyles.darkPrimaryColor : const Color(0xFF2E7D32)).withOpacity(0.7),
           ],
         ),
       ),
@@ -251,7 +275,11 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context, bool isDark) {
+    final primaryColor = isDark ? AppStyles.darkPrimaryColor : AppStyles.primaryColor;
+    final textColor = isDark ? Colors.white : const Color(0xFF1B5E20);
+    final secondaryTextColor = isDark ? Colors.grey[300] : Colors.grey[700];
+    
     return Container(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -260,11 +288,11 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
           // Title
           Text(
             widget.guide.title,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Amiri',
               fontSize: 28,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1B5E20),
+              color: textColor,
               height: 1.3,
             ),
           ),
@@ -275,19 +303,19 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
               Expanded(
                 child: Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.location_on,
                       size: 20,
-                      color: Color(0xFF2E7D32),
+                      color: primaryColor,
                     ),
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
                         widget.guide.location,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 16,
-                          color: Color(0xFF2E7D32),
+                          color: primaryColor,
                           fontWeight: FontWeight.w600,
                         ),
                         textDirection: TextDirection.rtl,
@@ -304,13 +332,13 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      const Color(0xFF2E7D32).withOpacity(0.1),
-                      const Color(0xFF388E3C).withOpacity(0.1),
+                      primaryColor.withOpacity(0.1),
+                      primaryColor.withOpacity(0.2),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: const Color(0xFF2E7D32).withOpacity(0.3),
+                    color: primaryColor.withOpacity(0.3),
                     width: 1,
                   ),
                 ),
@@ -319,18 +347,18 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
                   children: [
                     Text(
                       '${widget.guide.formattedViewCount} مشاهدة',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 12,
-                        color: Color(0xFF2E7D32),
+                        color: primaryColor,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(width: 4),
-                    const Icon(
+                    Icon(
                       Icons.visibility,
                       size: 16,
-                      color: Color(0xFF2E7D32),
+                      color: primaryColor,
                     ),
                   ],
                 ),
@@ -342,7 +370,7 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
           Text(
             widget.guide.description,
             style: AppStyles.bodyTextStyle.copyWith(
-              color: Colors.grey[700],
+              color: secondaryTextColor,
               height: 1.6,
             ),
             textDirection: TextDirection.rtl,
@@ -353,16 +381,21 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
     );
   }
 
-  Widget _buildContent() {
+  Widget _buildContent(BuildContext context, bool isDark) {
+    final primaryColor = isDark ? AppStyles.darkPrimaryColor : AppStyles.primaryColor;
+    final cardColor = isDark ? Colors.grey[800] : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF1B5E20);
+    final bodyTextColor = isDark ? Colors.grey[300] : const Color(0xFF424242);
+    
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: isDark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -376,32 +409,32 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2E7D32).withOpacity(0.1),
+                  color: primaryColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.article,
-                  color: Color(0xFF2E7D32),
+                  color: primaryColor,
                   size: 20,
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 'تفاصيل الدليل',
                 style: TextStyle(
                   fontFamily: 'Amiri',
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1B5E20),
+                  color: textColor,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
           Text(
-            widget.guide.content,
+            widget.guide.description,
             style: AppStyles.bodyTextStyle.copyWith(
-              color: const Color(0xFF424242),
+              color: bodyTextColor,
               height: 1.8,
             ),
             textDirection: TextDirection.rtl,
@@ -412,46 +445,49 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
     );
   }
 
-  Widget _buildTags() {
-    if (widget.guide.tags.isEmpty) return const SizedBox();
+  Widget _buildTags(BuildContext context, bool isDark) {
+    if (widget.guide.highlights.isEmpty) return const SizedBox();
+
+    final primaryColor = isDark ? AppStyles.darkPrimaryColor : AppStyles.primaryColor;
+    final textColor = isDark ? Colors.white : const Color(0xFF1B5E20);
 
     return Container(
       margin: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'الكلمات المفتاحية',
+          Text(
+            'النقاط المميزة',
             style: TextStyle(
               fontFamily: 'Amiri',
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1B5E20),
+              color: textColor,
             ),
           ),
           const SizedBox(height: 12),
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: widget.guide.tags.map((tag) {
+            children: widget.guide.highlights.map((highlight) {
               return Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2E7D32).withOpacity(0.1),
+                  color: primaryColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: const Color(0xFF2E7D32).withOpacity(0.3),
+                    color: primaryColor.withOpacity(0.3),
                   ),
                 ),
                 child: Text(
-                  tag,
-                  style: const TextStyle(
+                  highlight,
+                  style: TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 12,
-                    color: Color(0xFF2E7D32),
+                    color: primaryColor,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -463,20 +499,379 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
     );
   }
 
-  Widget _buildLocationInfo() {
-    if (widget.guide.latitude == null || widget.guide.longitude == null) {
+  Widget _buildAdditionalInfo(BuildContext context, bool isDark) {
+    final primaryColor = isDark ? AppStyles.darkPrimaryColor : AppStyles.primaryColor;
+    final cardColor = isDark ? Colors.grey[800] : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF1B5E20);
+    final bodyTextColor = isDark ? Colors.grey[300] : const Color(0xFF424242);
+    final iconColor = isDark ? AppStyles.darkPrimaryColor : const Color(0xFF2E7D32);
+    
+    if (widget.guide.bestSeason == null && 
+        widget.guide.estimatedDuration == null && 
+        widget.guide.entryFee == 0 && 
+        widget.guide.tips.isEmpty) {
       return const SizedBox();
     }
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'معلومات إضافية',
+            style: TextStyle(
+              fontFamily: 'Amiri',
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: textColor,
+            ),
+          ),
+          const SizedBox(height: 16),
+          
+          // Best Season Card
+          if (widget.guide.bestSeason != null)
+            Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: cardColor,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: isDark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: iconColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      Icons.wb_sunny,
+                      color: iconColor,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'أفضل وقت للزيارة',
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: textColor,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          widget.guide.bestSeason!,
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 13,
+                            color: bodyTextColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          
+          // Duration Card
+          if (widget.guide.estimatedDuration != null)
+            Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: cardColor,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: isDark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: iconColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      Icons.access_time,
+                      color: iconColor,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'المدة المقدرة',
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: textColor,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          widget.guide.estimatedDuration!,
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 13,
+                            color: bodyTextColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          
+          // Entry Fee Card
+          if (widget.guide.entryFee > 0)
+            Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: cardColor,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: isDark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: iconColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      Icons.attach_money,
+                      color: iconColor,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'رسوم الدخول',
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: textColor,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${widget.guide.entryFee.toStringAsFixed(2)} ${widget.guide.currency}',
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 13,
+                            color: bodyTextColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          
+          // Difficulty Level Card
+          Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: cardColor,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: isDark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: iconColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.trending_up,
+                    color: iconColor,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'مستوى الصعوبة',
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: textColor,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        widget.guide.difficultyDisplayName,
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 13,
+                          color: bodyTextColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // Tips Card
+          if (widget.guide.tips.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: cardColor,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: isDark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: iconColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          Icons.lightbulb,
+                          color: iconColor,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        'نصائح مفيدة',
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: textColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  ...widget.guide.tips.map((tip) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.only(top: 6),
+                          width: 4,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: iconColor,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            tip,
+                            style: TextStyle(
+                              fontFamily: 'Tajawal',
+                              fontSize: 13,
+                              color: bodyTextColor,
+                              height: 1.4,
+                            ),
+                            textDirection: TextDirection.rtl,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )).toList(),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLocationInfo(BuildContext context, bool isDark) {
+    if (widget.guide.latitude == null || widget.guide.longitude == null) {
+      return const SizedBox();
+    }
+
+    final primaryColor = isDark ? AppStyles.darkPrimaryColor : AppStyles.primaryColor;
+    final cardColor = isDark ? Colors.grey[800] : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF1B5E20);
+    final bodyTextColor = isDark ? Colors.grey[300] : const Color(0xFF424242);
+    final iconColor = isDark ? AppStyles.darkPrimaryColor : const Color(0xFF2E7D32);
+    final backgroundColor = isDark ? Colors.grey[750] : Colors.grey[50];
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: isDark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -490,23 +885,23 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2E7D32).withOpacity(0.1),
+                  color: iconColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.map,
-                  color: Color(0xFF2E7D32),
+                  color: iconColor,
                   size: 20,
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 'معلومات الموقع',
                 style: TextStyle(
                   fontFamily: 'Amiri',
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1B5E20),
+                  color: textColor,
                 ),
               ),
             ],
@@ -515,27 +910,27 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.grey[50],
+              color: backgroundColor,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
               children: [
                 Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.location_on,
-                      color: Color(0xFF2E7D32),
+                      color: iconColor,
                       size: 20,
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         widget.guide.location,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF2E7D32),
+                          color: iconColor,
                         ),
                       ),
                     ),
@@ -544,30 +939,34 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.gps_fixed,
-                      color: Colors.grey,
+                      color: bodyTextColor,
                       size: 16,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       'خط العرض: ${widget.guide.latitude!.toStringAsFixed(6)}',
-                      style: AppStyles.subtitleStyle,
+                      style: AppStyles.subtitleStyle.copyWith(
+                        color: bodyTextColor,
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.gps_fixed,
-                      color: Colors.grey,
+                      color: bodyTextColor,
                       size: 16,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       'خط الطول: ${widget.guide.longitude!.toStringAsFixed(6)}',
-                      style: AppStyles.subtitleStyle,
+                      style: AppStyles.subtitleStyle.copyWith(
+                        color: bodyTextColor,
+                      ),
                     ),
                   ],
                 ),
@@ -585,7 +984,7 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2E7D32),
+                      backgroundColor: iconColor,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
@@ -602,13 +1001,14 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
     );
   }
 
-  Widget _buildRelatedGuides() {
+  Widget _buildRelatedGuides(BuildContext context, bool isDark) {
     if (_isLoadingRelated) {
-      return const Center(
+      final primaryColor = isDark ? AppStyles.darkPrimaryColor : const Color(0xFF2E7D32);
+      return Center(
         child: Padding(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: CircularProgressIndicator(
-            color: Color(0xFF2E7D32),
+            color: primaryColor,
           ),
         ),
       );
@@ -616,20 +1016,22 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
 
     if (_relatedGuides.isEmpty) return const SizedBox();
 
+    final textColor = isDark ? Colors.white : const Color(0xFF1B5E20);
+
     return Container(
       margin: const EdgeInsets.only(top: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Text(
               'أدلة ذات صلة',
               style: TextStyle(
                 fontFamily: 'Amiri',
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF1B5E20),
+                color: textColor,
               ),
             ),
           ),
@@ -643,7 +1045,7 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
               itemCount: _relatedGuides.length,
               itemBuilder: (context, index) {
                 final guide = _relatedGuides[index];
-                return _buildRelatedGuideCard(guide);
+                return _buildRelatedGuideCard(guide, isDark);
               },
             ),
           ),
@@ -652,142 +1054,197 @@ class _TravelGuideDetailScreenState extends State<TravelGuideDetailScreen>
     );
   }
 
-  Widget _buildRelatedGuideCard(TravelGuide guide) {
+  Widget _buildRelatedGuideCard(TravelGuide guide, bool isDark) {
+    final cardColor = isDark ? Colors.grey[800] : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF1B5E20);
+    final primaryColor = isDark ? AppStyles.darkPrimaryColor : const Color(0xFF2E7D32);
+
     return Container(
       width: 160,
       margin: const EdgeInsets.only(right: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: isDark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.08),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
       ),
-      child: InkWell(
-        onTap: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => TravelGuideDetailScreen(guide: guide),
-            ),
-          );
-        },
-        borderRadius: BorderRadius.circular(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => TravelGuideDetailScreen(guide: guide),
               ),
-              child: SizedBox(
-                height: 100,
-                width: double.infinity,
-                child: guide.imageUrl != null
-                    ? Image.network(
-                        guide.imageUrl!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  const Color(0xFF2E7D32).withOpacity(0.3),
-                                  const Color(0xFF2E7D32).withOpacity(0.5),
-                                ],
+            );
+          },
+          borderRadius: BorderRadius.circular(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  topRight: Radius.circular(12),
+                ),
+                child: SizedBox(
+                  height: 100,
+                  width: double.infinity,
+                  child: guide.primaryImageUrl.isNotEmpty
+                      ? Image.network(
+                          guide.primaryImageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    primaryColor.withOpacity(0.3),
+                                    primaryColor.withOpacity(0.5),
+                                  ],
+                                ),
                               ),
+                              child: const Icon(
+                                Icons.explore,
+                                color: Colors.white,
+                                size: 30,
+                              ),
+                            );
+                          },
+                        )
+                      : Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                primaryColor.withOpacity(0.3),
+                                primaryColor.withOpacity(0.5),
+                              ],
                             ),
-                            child: const Icon(
-                              Icons.explore,
-                              color: Colors.white,
-                              size: 30,
-                            ),
-                          );
-                        },
-                      )
-                    : Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              const Color(0xFF2E7D32).withOpacity(0.3),
-                              const Color(0xFF2E7D32).withOpacity(0.5),
-                            ],
+                          ),
+                          child: const Icon(
+                            Icons.explore,
+                            color: Colors.white,
+                            size: 30,
                           ),
                         ),
-                        child: const Icon(
-                          Icons.explore,
-                          color: Colors.white,
-                          size: 30,
-                        ),
-                      ),
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      guide.title,
-                      style: const TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1B5E20),
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      guide.location,
-                      style: const TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontSize: 12,
-                        color: Color(0xFF2E7D32),
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
                 ),
               ),
-            ),
-          ],
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        guide.title,
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: textColor,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        guide.location,
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 12,
+                          color: primaryColor,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   void _shareGuide() {
-    // TODO: Implement share functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'ميزة المشاركة قيد التطوير',
-          style: TextStyle(fontFamily: 'Tajawal'),
-        ),
-        backgroundColor: Color(0xFF2E7D32),
-      ),
+    final shareText = '''اكتشف هذا المكان الرائع!
+
+${widget.guide.title}
+${widget.guide.location}
+
+${widget.guide.description}
+
+${widget.guide.highlights.isNotEmpty ? '\nالنقاط المميزة:\n${widget.guide.highlights.map((h) => '• $h').join('\n')}' : ''}
+
+تطبيق ريزيرفيتو - دليلك السياحي في الجزائر''';
+
+    Share.share(
+      shareText,
+      subject: 'دليل سياحي: ${widget.guide.title}',
     );
   }
 
-  void _openInMaps() {
-    // TODO: Implement open in maps functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'ميزة فتح الخرائط قيد التطوير',
-          style: TextStyle(fontFamily: 'Tajawal'),
+  void _openInMaps() async {
+    if (widget.guide.latitude == null || widget.guide.longitude == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'إحداثيات الموقع غير متوفرة',
+            style: TextStyle(fontFamily: 'Tajawal'),
+          ),
+          backgroundColor: Colors.orange,
         ),
-        backgroundColor: Color(0xFF2E7D32),
-      ),
-    );
+      );
+      return;
+    }
+
+    final lat = widget.guide.latitude!;
+    final lng = widget.guide.longitude!;
+    final title = Uri.encodeComponent(widget.guide.title);
+
+    // Try Google Maps first, then Apple Maps, then generic maps URL
+    final urls = [
+      'https://www.google.com/maps/search/?api=1&query=$lat,$lng&query_place_id=$title',
+      'https://maps.apple.com/?q=$title&ll=$lat,$lng',
+      'https://www.openstreetmap.org/?mlat=$lat&mlon=$lng&zoom=15'
+    ];
+
+    bool launched = false;
+    for (String url in urls) {
+      try {
+        if (await canLaunchUrl(Uri.parse(url))) {
+          await launchUrl(
+            Uri.parse(url),
+            mode: LaunchMode.externalApplication,
+          );
+          launched = true;
+          break;
+        }
+      } catch (e) {
+        continue;
+      }
+    }
+
+    if (!launched) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'لم يتم العثور على تطبيق خرائط مناسب',
+              style: TextStyle(fontFamily: 'Tajawal'),
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }

@@ -117,8 +117,10 @@ class _SignInScreenState extends State<SignInScreen> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Colors.blue.shade50,
-                Colors.white,
+                Theme.of(context).brightness == Brightness.dark
+                    ? Theme.of(context).scaffoldBackgroundColor
+                    : Colors.blue.shade50,
+                Theme.of(context).scaffoldBackgroundColor,
               ],
             ),
           ),
@@ -138,7 +140,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       child: IconButton(
                         onPressed: () => Navigator.pop(context),
                         icon: const Icon(Icons.arrow_back_ios),
-                        color: Colors.blue.shade600,
+                        color: Theme.of(context).primaryColor,
                       ),
                     ),
                     
@@ -150,7 +152,9 @@ class _SignInScreenState extends State<SignInScreen> {
                         width: 80,
                         height: 80,
                         child: Image.asset(
-                          'assest/images/logo_black.png',
+                          Theme.of(context).brightness == Brightness.dark
+                              ? 'assest/images/logo_white.png'
+                              : 'assest/images/logo_black.png',
                           fit: BoxFit.contain,
                         ),
                       ),
@@ -166,7 +170,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         fontFamily: 'Amiri',
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
-                        color: Colors.blue.shade800,
+                        color: Theme.of(context).textTheme.headlineLarge?.color,
                       ),
                     ),
                     
@@ -178,7 +182,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       style: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 16,
-                        color: Colors.grey.shade600,
+                        color: Theme.of(context).textTheme.bodyMedium?.color,
                       ),
                     ),
                     
@@ -202,10 +206,12 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.blue.shade600, width: 2),
+                          borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
                         ),
                         filled: true,
-                        fillColor: Colors.grey.shade50,
+                        fillColor: Theme.of(context).brightness == Brightness.dark
+                            ? Theme.of(context).cardColor
+                            : Colors.grey.shade50,
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -247,10 +253,12 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.blue.shade600, width: 2),
+                          borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
                         ),
                         filled: true,
-                        fillColor: Colors.grey.shade50,
+                        fillColor: Theme.of(context).brightness == Brightness.dark
+                            ? Theme.of(context).cardColor
+                            : Colors.grey.shade50,
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -279,7 +287,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                   _rememberMe = value ?? false;
                                 });
                               },
-                              activeColor: Colors.blue.shade600,
+                              activeColor: Theme.of(context).primaryColor,
                             ),
                             Text(
                               'تذكرني',
@@ -305,7 +313,7 @@ class _SignInScreenState extends State<SignInScreen> {
                             'نسيت كلمة المرور؟',
                             style: TextStyle(
                               fontFamily: 'Tajawal',
-                              color: Colors.blue.shade600,
+                              color: Theme.of(context).primaryColor,
                               fontWeight: FontWeight.w500,
                             ),
                           ),

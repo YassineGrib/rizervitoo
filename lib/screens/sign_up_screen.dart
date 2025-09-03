@@ -133,8 +133,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Colors.blue.shade50,
-                Colors.white,
+                Theme.of(context).brightness == Brightness.dark
+                    ? Theme.of(context).scaffoldBackgroundColor
+                    : Colors.blue.shade50,
+                Theme.of(context).scaffoldBackgroundColor,
               ],
             ),
           ),
@@ -154,7 +156,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       child: IconButton(
                         onPressed: () => Navigator.pop(context),
                         icon: const Icon(Icons.arrow_back_ios),
-                        color: Colors.blue.shade600,
+                        color: Theme.of(context).primaryColor,
                       ),
                     ),
                     
@@ -166,7 +168,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         width: 70,
                         height: 70,
                         child: Image.asset(
-                          'assest/images/logo_black.png',
+                          Theme.of(context).brightness == Brightness.dark
+                              ? 'assest/images/logo_white.png'
+                              : 'assest/images/logo_black.png',
                           fit: BoxFit.contain,
                         ),
                       ),
@@ -182,7 +186,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         fontFamily: 'Amiri',
                         fontSize: 26,
                         fontWeight: FontWeight.bold,
-                        color: Colors.blue.shade800,
+                        color: Theme.of(context).textTheme.headlineLarge?.color,
                       ),
                     ),
                     
@@ -194,7 +198,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       style: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 16,
-                        color: Colors.grey.shade600,
+                        color: Theme.of(context).textTheme.bodyMedium?.color,
                       ),
                     ),
                     
@@ -216,10 +220,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.blue.shade600, width: 2),
+                          borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
                         ),
                         filled: true,
-                        fillColor: Colors.grey.shade50,
+                        fillColor: Theme.of(context).brightness == Brightness.dark
+                            ? Theme.of(context).cardColor
+                            : Colors.grey.shade50,
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -252,10 +258,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.blue.shade600, width: 2),
+                          borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
                         ),
                         filled: true,
-                        fillColor: Colors.grey.shade50,
+                        fillColor: Theme.of(context).brightness == Brightness.dark
+                            ? Theme.of(context).cardColor
+                            : Colors.grey.shade50,
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -297,10 +305,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.blue.shade600, width: 2),
+                          borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
                         ),
                         filled: true,
-                        fillColor: Colors.grey.shade50,
+                        fillColor: Theme.of(context).brightness == Brightness.dark
+                            ? Theme.of(context).cardColor
+                            : Colors.grey.shade50,
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -342,10 +352,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.blue.shade600, width: 2),
+                          borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
                         ),
                         filled: true,
-                        fillColor: Colors.grey.shade50,
+                        fillColor: Theme.of(context).brightness == Brightness.dark
+                            ? Theme.of(context).cardColor
+                            : Colors.grey.shade50,
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {

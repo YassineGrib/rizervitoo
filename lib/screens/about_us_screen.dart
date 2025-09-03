@@ -6,14 +6,14 @@ class AboutUsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios,
-            color: Colors.blue.shade800,
+            color: Theme.of(context).textTheme.headlineLarge?.color,
           ),
           onPressed: () => Navigator.pop(context),
         ),
@@ -23,7 +23,7 @@ class AboutUsScreen extends StatelessWidget {
             fontFamily: 'Amiri',
             fontSize: 22,
             fontWeight: FontWeight.bold,
-            color: Colors.blue.shade800,
+            color: Theme.of(context).textTheme.headlineLarge?.color,
           ),
         ),
         centerTitle: true,
@@ -41,7 +41,9 @@ class AboutUsScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.blue.withOpacity(0.1),
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.black.withOpacity(0.3)
+                        : Colors.blue.withOpacity(0.1),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -50,7 +52,9 @@ class AboutUsScreen extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
                 child: Image.asset(
-                  'assest/images/logo_blue.png',
+                  Theme.of(context).brightness == Brightness.dark
+                      ? 'assest/images/logo_white.png'
+                      : 'assest/images/logo_blue.png',
                   fit: BoxFit.contain,
                 ),
               ),
@@ -65,7 +69,7 @@ class AboutUsScreen extends StatelessWidget {
                 fontFamily: 'Amiri',
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
-                color: Colors.blue.shade800,
+                color: Theme.of(context).textTheme.headlineLarge?.color,
               ),
             ),
             
@@ -78,7 +82,7 @@ class AboutUsScreen extends StatelessWidget {
               style: TextStyle(
                 fontFamily: 'Tajawal',
                 fontSize: 18,
-                color: Colors.grey.shade600,
+                color: Theme.of(context).textTheme.bodyMedium?.color,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -87,6 +91,7 @@ class AboutUsScreen extends StatelessWidget {
             
             // About Section
             _buildSection(
+              context: context,
               title: 'من نحن',
               content: 'RizerVitoo هو تطبيق سياحي جزائري مبتكر يهدف إلى تسهيل عملية حجز الإقامات السياحية في جميع أنحاء الجزائر. نحن نربط بين المسافرين وأصحاب العقارات السياحية لتوفير تجربة سفر مميزة وآمنة.',
               icon: Icons.info_outline,
@@ -96,6 +101,7 @@ class AboutUsScreen extends StatelessWidget {
             
             // Mission Section
             _buildSection(
+              context: context,
               title: 'رسالتنا',
               content: 'نسعى لتعزيز السياحة الداخلية في الجزائر من خلال توفير منصة رقمية سهلة الاستخدام تمكن المسافرين من اكتشاف أجمل الوجهات السياحية والحصول على أفضل الإقامات بأسعار مناسبة.',
               icon: Icons.flag_outlined,
@@ -105,6 +111,7 @@ class AboutUsScreen extends StatelessWidget {
             
             // Features Section
             _buildSection(
+              context: context,
               title: 'خدماتنا',
               content: '• حجز الإقامات السياحية (فنادق، منازل، مراقد)\n• دليل سياحي شامل للوجهات الجزائرية\n• خدمات الوكالات السياحية\n• مرشدين سياحيين محليين\n• نظام تقييم ومراجعات موثوق\n• دعم فني على مدار الساعة',
               icon: Icons.star_outline,
@@ -114,6 +121,7 @@ class AboutUsScreen extends StatelessWidget {
             
             // Vision Section
             _buildSection(
+              context: context,
               title: 'رؤيتنا',
               content: 'أن نكون المنصة الرائدة للسياحة الداخلية في الجزائر، ونساهم في تطوير القطاع السياحي من خلال التكنولوجيا الحديثة والخدمات المتميزة.',
               icon: Icons.visibility_outlined,
@@ -127,19 +135,32 @@ class AboutUsScreen extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.blue.shade50, Colors.blue.shade100],
+                  colors: [
+                    Theme.of(context).brightness == Brightness.dark
+                        ? Theme.of(context).primaryColor.withOpacity(0.15)
+                        : Theme.of(context).primaryColor.withOpacity(0.1),
+                    Theme.of(context).brightness == Brightness.dark
+                        ? Theme.of(context).primaryColor.withOpacity(0.08)
+                        : Theme.of(context).primaryColor.withOpacity(0.05),
+                  ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.blue.shade200),
+                border: Border.all(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Theme.of(context).primaryColor.withOpacity(0.4)
+                      : Theme.of(context).primaryColor.withOpacity(0.2),
+                ),
               ),
               child: Column(
                 children: [
                   Icon(
                     Icons.contact_support_outlined,
                     size: 40,
-                    color: Colors.blue.shade700,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Theme.of(context).primaryColor.withOpacity(0.9)
+                        : Theme.of(context).primaryColor,
                   ),
                   const SizedBox(height: 12),
                   Text(
@@ -148,7 +169,7 @@ class AboutUsScreen extends StatelessWidget {
                       fontFamily: 'Amiri',
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Colors.blue.shade800,
+                      color: Theme.of(context).textTheme.headlineMedium?.color,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -158,7 +179,7 @@ class AboutUsScreen extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: 'Tajawal',
                       fontSize: 14,
-                      color: Colors.grey.shade600,
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -166,6 +187,7 @@ class AboutUsScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       _buildContactButton(
+                        context: context,
                         icon: Icons.email_outlined,
                         label: 'البريد الإلكتروني',
                         onTap: () {
@@ -173,6 +195,7 @@ class AboutUsScreen extends StatelessWidget {
                         },
                       ),
                       _buildContactButton(
+                        context: context,
                         icon: Icons.phone_outlined,
                         label: 'الهاتف',
                         onTap: () {
@@ -193,7 +216,7 @@ class AboutUsScreen extends StatelessWidget {
               style: TextStyle(
                 fontFamily: 'Tajawal',
                 fontSize: 12,
-                color: Colors.grey.shade400,
+                color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.6),
               ),
             ),
             
@@ -204,7 +227,7 @@ class AboutUsScreen extends StatelessWidget {
               style: TextStyle(
                 fontFamily: 'Tajawal',
                 fontSize: 12,
-                color: Colors.grey.shade400,
+                color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.6),
               ),
             ),
           ],
@@ -214,6 +237,7 @@ class AboutUsScreen extends StatelessWidget {
   }
   
   Widget _buildSection({
+    required BuildContext context,
     required String title,
     required String content,
     required IconData icon,
@@ -222,16 +246,22 @@ class AboutUsScreen extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.black.withOpacity(0.2)
+                : Colors.grey.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
         ],
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Theme.of(context).dividerColor.withOpacity(0.3)
+              : Theme.of(context).dividerColor,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -241,12 +271,16 @@ class AboutUsScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Theme.of(context).primaryColor.withOpacity(0.15)
+                      : Theme.of(context).primaryColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   icon,
-                  color: Colors.blue.shade700,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Theme.of(context).primaryColor.withOpacity(0.9)
+                      : Theme.of(context).primaryColor,
                   size: 24,
                 ),
               ),
@@ -257,7 +291,7 @@ class AboutUsScreen extends StatelessWidget {
                   fontFamily: 'Amiri',
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue.shade800,
+                  color: Theme.of(context).textTheme.headlineMedium?.color,
                 ),
               ),
             ],
@@ -265,10 +299,10 @@ class AboutUsScreen extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             content,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 16,
-              color: Colors.black87,
+              color: Theme.of(context).textTheme.bodyLarge?.color,
               height: 1.6,
             ),
           ),
@@ -278,38 +312,62 @@ class AboutUsScreen extends StatelessWidget {
   }
   
   Widget _buildContactButton({
+    required BuildContext context,
     required IconData icon,
     required String label,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.blue.shade300),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 16,
-              color: Colors.blue.shade700,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Theme.of(context).cardColor.withOpacity(0.8)
+                : Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Theme.of(context).primaryColor.withOpacity(0.4)
+                  : Theme.of(context).primaryColor.withOpacity(0.3),
             ),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: TextStyle(
-                fontFamily: 'Tajawal',
-                fontSize: 12,
-                color: Colors.blue.shade700,
-                fontWeight: FontWeight.w500,
+            boxShadow: Theme.of(context).brightness == Brightness.dark
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 16,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Theme.of(context).primaryColor.withOpacity(0.9)
+                    : Theme.of(context).primaryColor,
               ),
-            ),
-          ],
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  fontFamily: 'Tajawal',
+                  fontSize: 12,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Theme.of(context).primaryColor.withOpacity(0.9)
+                      : Theme.of(context).primaryColor,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

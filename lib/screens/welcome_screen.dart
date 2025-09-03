@@ -17,9 +17,13 @@ class WelcomeScreen extends StatelessWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Colors.blue.shade50,
-                Colors.white,
-                Colors.blue.shade50,
+                Theme.of(context).brightness == Brightness.dark
+                    ? Theme.of(context).scaffoldBackgroundColor
+                    : Colors.blue.shade50,
+                Theme.of(context).scaffoldBackgroundColor,
+                Theme.of(context).brightness == Brightness.dark
+                    ? Theme.of(context).scaffoldBackgroundColor
+                    : Colors.blue.shade50,
               ],
             ),
           ),
@@ -37,7 +41,9 @@ class WelcomeScreen extends StatelessWidget {
                       Navigator.pushNamed(context, '/admin-login');
                     },
                     child: Image.asset(
-                      'assest/images/logo_black.png',
+                      Theme.of(context).brightness == Brightness.dark
+                          ? 'assest/images/logo_white.png'
+                          : 'assest/images/logo_black.png',
                       width: 100,
                       height: 100,
                       fit: BoxFit.contain,
@@ -66,7 +72,7 @@ class WelcomeScreen extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: 'Tajawal',
                       fontSize: 18,
-                      color: Colors.grey.shade600,
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                       height: 1.5,
                     ),
                   ),
@@ -79,7 +85,7 @@ class WelcomeScreen extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: 'Tajawal',
                       fontSize: 16,
-                      color: Colors.blue.shade600,
+                      color: Theme.of(context).primaryColor,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -100,7 +106,7 @@ class WelcomeScreen extends StatelessWidget {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue.shade600,
+                        backgroundColor: Theme.of(context).primaryColor,
                         foregroundColor: Colors.white,
                         elevation: 2,
                         shape: RoundedRectangleBorder(
@@ -134,8 +140,8 @@ class WelcomeScreen extends StatelessWidget {
                         );
                       },
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.blue.shade600,
-                        side: BorderSide(color: Colors.blue.shade600, width: 2),
+                        foregroundColor: Theme.of(context).primaryColor,
+                        side: BorderSide(color: Theme.of(context).primaryColor, width: 2),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -169,10 +175,12 @@ class WelcomeScreen extends StatelessWidget {
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.blue.shade50,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Theme.of(context).primaryColor.withOpacity(0.1)
+                            : Colors.blue.shade50,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: Colors.blue.shade200,
+                          color: Theme.of(context).primaryColor.withOpacity(0.3),
                           width: 1,
                         ),
                       ),
@@ -182,7 +190,7 @@ class WelcomeScreen extends StatelessWidget {
                           Icon(
                             Icons.info_outline,
                             size: 16,
-                            color: Colors.blue.shade600,
+                            color: Theme.of(context).primaryColor,
                           ),
                           const SizedBox(width: 6),
                           Text(
@@ -190,7 +198,7 @@ class WelcomeScreen extends StatelessWidget {
                             style: TextStyle(
                               fontFamily: 'Tajawal',
                               fontSize: 14,
-                              color: Colors.blue.shade600,
+                              color: Theme.of(context).primaryColor,
                               fontWeight: FontWeight.w500,
                             ),
                           ),

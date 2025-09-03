@@ -230,13 +230,19 @@ class _TravelGuidesScreenState extends State<TravelGuidesScreen>
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: Colors.grey[50],
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
           title: const Text(
             'الأدلة السياحية',
-            style: AppStyles.appBarTitleStyle,
+            style: TextStyle(
+              fontFamily: 'Amiri',
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          backgroundColor: AppStyles.primaryColor,
+          backgroundColor: Theme.of(context).brightness == Brightness.dark
+              ? AppStyles.darkPrimaryColor
+              : AppStyles.primaryColor,
+          foregroundColor: Colors.white,
           elevation: 0,
           centerTitle: true,
           bottom: TabBar(
@@ -245,12 +251,12 @@ class _TravelGuidesScreenState extends State<TravelGuidesScreen>
             indicatorWeight: 3,
             labelColor: Colors.white,
             unselectedLabelColor: Colors.white70,
-            labelStyle: AppStyles.buttonTextStyle.copyWith(
-              color: Colors.white,
+            labelStyle: const TextStyle(
+              fontFamily: 'Tajawal',
               fontWeight: FontWeight.bold,
             ),
-            unselectedLabelStyle: AppStyles.buttonTextStyle.copyWith(
-              color: Colors.white70,
+            unselectedLabelStyle: const TextStyle(
+              fontFamily: 'Tajawal',
               fontSize: 14,
             ),
             tabs: _tabs.map((tab) => Tab(text: tab)).toList(),
@@ -362,20 +368,17 @@ class _TravelGuidesScreenState extends State<TravelGuidesScreen>
                           return _buildCategoryChip('الكل', null);
                         }
                         final category = _categories[index - 1];
+                        final categoryDisplayName = {
+                          'historical': 'تاريخي',
+                          'natural': 'طبيعي',
+                          'cultural': 'ثقافي',
+                          'adventure': 'مغامرة',
+                          'religious': 'ديني',
+                          'beach': 'شاطئ',
+                          'mountain': 'جبلي',
+                        };
                         return _buildCategoryChip(
-                          TravelGuide(
-                            id: '',
-                            title: '',
-                            description: '',
-                            content: '',
-                            category: category,
-                            tags: [],
-                            location: '',
-                            isPublished: true,
-                            viewCount: 0,
-                            createdAt: DateTime.now(),
-                            updatedAt: DateTime.now(),
-                          ).categoryDisplayName,
+                          categoryDisplayName[category] ?? category,
                           category,
                         );
                       },
@@ -388,9 +391,11 @@ class _TravelGuidesScreenState extends State<TravelGuidesScreen>
           // Content
           Expanded(
             child: _isLoading
-                ? const Center(
+                ? Center(
                     child: CircularProgressIndicator(
-                      color: Color(0xFF2E7D32),
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? AppStyles.darkPrimaryColor
+                          : AppStyles.primaryColor,
                     ),
                   )
                 : _travelGuides.isEmpty
@@ -458,7 +463,9 @@ class _TravelGuidesScreenState extends State<TravelGuidesScreen>
           Icon(
             Icons.explore_off,
             size: 80,
-            color: Colors.grey[400],
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[600]
+                : Colors.grey[400],
           ),
           const SizedBox(height: 16),
           Text(
@@ -466,7 +473,7 @@ class _TravelGuidesScreenState extends State<TravelGuidesScreen>
             style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 18,
-              color: Colors.grey[600],
+              color: Theme.of(context).textTheme.bodyLarge?.color,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -476,7 +483,7 @@ class _TravelGuidesScreenState extends State<TravelGuidesScreen>
             style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 14,
-              color: Colors.grey[500],
+              color: Theme.of(context).textTheme.bodyMedium?.color,
             ),
             textAlign: TextAlign.center,
           ),
@@ -488,18 +495,22 @@ class _TravelGuidesScreenState extends State<TravelGuidesScreen>
   Widget _buildTravelGuidesList() {
     return RefreshIndicator(
       onRefresh: () => _loadDataForTab(_tabController.index),
-      color: const Color(0xFF2E7D32),
+      color: Theme.of(context).brightness == Brightness.dark
+          ? AppStyles.darkPrimaryColor
+          : AppStyles.primaryColor,
       child: ListView.builder(
         controller: _scrollController,
         padding: const EdgeInsets.all(16),
         itemCount: _travelGuides.length + (_isLoadingMore ? 1 : 0),
         itemBuilder: (context, index) {
           if (index == _travelGuides.length) {
-            return const Center(
+            return Center(
               child: Padding(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 child: CircularProgressIndicator(
-                  color: Color(0xFF2E7D32),
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? AppStyles.darkPrimaryColor
+                      : AppStyles.primaryColor,
                 ),
               ),
             );
@@ -516,11 +527,13 @@ class _TravelGuidesScreenState extends State<TravelGuidesScreen>
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.black.withOpacity(0.3)
+                : Colors.black.withOpacity(0.08),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -553,16 +566,20 @@ class _TravelGuidesScreenState extends State<TravelGuidesScreen>
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      const Color(0xFF2E7D32).withOpacity(0.1),
-                      const Color(0xFF2E7D32).withOpacity(0.3),
+                      (Theme.of(context).brightness == Brightness.dark
+                          ? AppStyles.darkPrimaryColor
+                          : AppStyles.primaryColor).withOpacity(0.1),
+                      (Theme.of(context).brightness == Brightness.dark
+                          ? AppStyles.darkPrimaryColor
+                          : AppStyles.primaryColor).withOpacity(0.3),
                     ],
                   ),
                 ),
-                child: guide.imageUrl != null
+                child: guide.primaryImageUrl.isNotEmpty
                     ? Stack(
                         children: [
                           Image.network(
-                            guide.imageUrl!,
+                            guide.primaryImageUrl,
                             height: 200,
                             width: double.infinity,
                             fit: BoxFit.cover,
@@ -622,8 +639,11 @@ class _TravelGuidesScreenState extends State<TravelGuidesScreen>
                   // Title
                   Text(
                     guide.title,
-                    style: AppStyles.sectionTitleStyle.copyWith(
-                      color: const Color(0xFF1B5E20),
+                    style: TextStyle(
+                      fontFamily: 'Amiri',
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).textTheme.headlineSmall?.color,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -632,19 +652,23 @@ class _TravelGuidesScreenState extends State<TravelGuidesScreen>
                   // Location
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.location_on,
                         size: 16,
-                        color: Color(0xFF2E7D32),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? AppStyles.darkPrimaryColor
+                            : AppStyles.primaryColor,
                       ),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
                           guide.location,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'Tajawal',
                             fontSize: 14,
-                            color: Color(0xFF2E7D32),
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? AppStyles.darkPrimaryColor
+                                : AppStyles.primaryColor,
                             fontWeight: FontWeight.w500,
                           ),
                           maxLines: 1,
@@ -660,7 +684,7 @@ class _TravelGuidesScreenState extends State<TravelGuidesScreen>
                     style: TextStyle(
                       fontFamily: 'Tajawal',
                       fontSize: 14,
-                      color: Colors.grey[600],
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                       height: 1.4,
                     ),
                     maxLines: 3,
@@ -674,18 +698,18 @@ class _TravelGuidesScreenState extends State<TravelGuidesScreen>
                       // Views
                       Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.visibility,
                             size: 16,
-                            color: Colors.grey,
+                            color: Theme.of(context).textTheme.bodyMedium?.color,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             '${guide.formattedViewCount} مشاهدة',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Tajawal',
                               fontSize: 12,
-                              color: Colors.grey,
+                              color: Theme.of(context).textTheme.bodyMedium?.color,
                             ),
                           ),
                         ],
@@ -697,15 +721,19 @@ class _TravelGuidesScreenState extends State<TravelGuidesScreen>
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF2E7D32).withOpacity(0.1),
+                          color: (Theme.of(context).brightness == Brightness.dark
+                              ? AppStyles.darkPrimaryColor
+                              : AppStyles.primaryColor).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        child: const Text(
+                        child: Text(
                           'اقرأ المزيد',
                           style: TextStyle(
                             fontFamily: 'Tajawal',
                             fontSize: 12,
-                            color: Color(0xFF2E7D32),
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? AppStyles.darkPrimaryColor
+                                : AppStyles.primaryColor,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -730,15 +758,21 @@ class _TravelGuidesScreenState extends State<TravelGuidesScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            const Color(0xFF2E7D32).withOpacity(0.1),
-            const Color(0xFF2E7D32).withOpacity(0.3),
+            (Theme.of(context).brightness == Brightness.dark
+                ? AppStyles.darkPrimaryColor
+                : AppStyles.primaryColor).withOpacity(0.1),
+            (Theme.of(context).brightness == Brightness.dark
+                ? AppStyles.darkPrimaryColor
+                : AppStyles.primaryColor).withOpacity(0.3),
           ],
         ),
       ),
-      child: const Icon(
+      child: Icon(
         Icons.explore,
         size: 60,
-        color: Color(0xFF2E7D32),
+        color: Theme.of(context).brightness == Brightness.dark
+            ? AppStyles.darkPrimaryColor
+            : AppStyles.primaryColor,
       ),
     );
   }

@@ -449,7 +449,7 @@ class _AdminTravelGuidesScreenState extends State<AdminTravelGuidesScreen> {
             // Stats
             Row(
               children: [
-                _buildStatChip(Icons.visibility, guide.viewCount.toString()),
+                _buildStatChip(Icons.visibility, guide.viewsCount.toString()),
                 const SizedBox(width: 12),
                 _buildStatChip(Icons.star, '0.0'), // Rating not implemented yet
                 const SizedBox(width: 12),

@@ -5,6 +5,8 @@ import '../../models/travel_agency.dart';
 import '../../services/travel_agency_service.dart';
 import '../../widgets/loading_widget.dart';
 import '../../widgets/error_widget.dart';
+import '../../constants/app_styles.dart';
+
 
 class TravelAgencyDetailsScreen extends StatefulWidget {
   final String agencyId;
@@ -99,6 +101,7 @@ class _TravelAgencyDetailsScreenState extends State<TravelAgencyDetailsScreen>
     }
 
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
@@ -131,8 +134,12 @@ class _TravelAgencyDetailsScreenState extends State<TravelAgencyDetailsScreen>
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Theme.of(context).primaryColor,
-                        Theme.of(context).primaryColor.withOpacity(0.8),
+                        Theme.of(context).brightness == Brightness.dark
+                            ? AppStyles.darkPrimaryColor
+                            : AppStyles.primaryColor,
+                        (Theme.of(context).brightness == Brightness.dark
+                            ? AppStyles.darkPrimaryColor
+                            : AppStyles.primaryColor).withOpacity(0.8),
                       ],
                     ),
                   ),
@@ -145,9 +152,13 @@ class _TravelAgencyDetailsScreenState extends State<TravelAgencyDetailsScreen>
               delegate: _SliverTabBarDelegate(
                 TabBar(
                   controller: _tabController,
-                  indicatorColor: Theme.of(context).primaryColor,
-                  labelColor: Theme.of(context).primaryColor,
-                  unselectedLabelColor: Colors.grey,
+                  indicatorColor: Theme.of(context).brightness == Brightness.dark
+                      ? AppStyles.darkPrimaryColor
+                      : AppStyles.primaryColor,
+                  labelColor: Theme.of(context).brightness == Brightness.dark
+                      ? AppStyles.darkPrimaryColor
+                      : AppStyles.primaryColor,
+                  unselectedLabelColor: Theme.of(context).textTheme.bodyMedium?.color,
                   tabs: const [
                     Tab(
                       icon: Icon(Icons.info),
@@ -341,10 +352,14 @@ class _TravelAgencyDetailsScreenState extends State<TravelAgencyDetailsScreen>
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor.withOpacity(0.1),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? AppStyles.darkPrimaryColor.withOpacity(0.2)
+                            : AppStyles.primaryColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: Theme.of(context).primaryColor.withOpacity(0.3),
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? AppStyles.darkPrimaryColor.withOpacity(0.4)
+                              : AppStyles.primaryColor.withOpacity(0.3),
                         ),
                       ),
                       child: Text(
@@ -352,7 +367,9 @@ class _TravelAgencyDetailsScreenState extends State<TravelAgencyDetailsScreen>
                         style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 14,
-                          color: Theme.of(context).primaryColor,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? AppStyles.darkPrimaryColor
+                              : AppStyles.primaryColor,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -482,15 +499,18 @@ class _TravelAgencyDetailsScreenState extends State<TravelAgencyDetailsScreen>
             Icon(
               icon,
               size: 20,
-              color: Theme.of(context).primaryColor,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? AppStyles.darkPrimaryColor
+                  : AppStyles.primaryColor,
             ),
             const SizedBox(width: 8),
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Amiri',
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                color: Theme.of(context).textTheme.headlineSmall?.color,
               ),
             ),
           ],
@@ -563,62 +583,73 @@ class _TravelAgencyDetailsScreenState extends State<TravelAgencyDetailsScreen>
 
   Widget _buildOfferCard(TravelAgencyOffer offer) {
     return Card(
+      color: Theme.of(context).cardColor,
       margin: const EdgeInsets.only(bottom: 16),
-      elevation: 2,
+      elevation: Theme.of(context).brightness == Brightness.dark ? 8 : 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header with title and featured badge
-            Row(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () {
+            // Handle offer tap
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Text(
-                    offer.title,
-                    style: const TextStyle(
-                      fontFamily: 'Amiri',
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                // Header with title and featured badge
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        offer.title,
+                        style: TextStyle(
+                          fontFamily: 'Amiri',
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).textTheme.headlineSmall?.color,
+                        ),
+                      ),
                     ),
-                  ),
+                    if (offer.isFeatured)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.amber.withOpacity(0.2)
+                              : Colors.amber[50],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.star,
+                              size: 14,
+                              color: Colors.amber[600],
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'مميز',
+                              style: TextStyle(
+                                fontFamily: 'Tajawal',
+                                fontSize: 12,
+                                color: Colors.amber[700],
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
                 ),
-                if (offer.isFeatured)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.amber[50],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.star,
-                          size: 14,
-                          color: Colors.amber[600],
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          'مميز',
-                          style: TextStyle(
-                            fontFamily: 'Tajawal',
-                            fontSize: 12,
-                            color: Colors.amber[700],
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-              ],
-            ),
             const SizedBox(height: 8),
             // Destination and duration
             Row(
@@ -751,6 +782,8 @@ class _TravelAgencyDetailsScreenState extends State<TravelAgencyDetailsScreen>
           ],
         ),
       ),
+       ),
+        ),
     );
   }
 
@@ -905,64 +938,75 @@ class _TravelAgencyDetailsScreenState extends State<TravelAgencyDetailsScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: 1,
-            blurRadius: 5,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.black.withOpacity(0.4)
+                : Colors.black.withOpacity(0.1),
+            blurRadius: 10,
             offset: const Offset(0, -2),
           ),
         ],
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: ElevatedButton.icon(
-              onPressed: () => _makePhoneCall(_agency!.phone),
-              icon: const Icon(Icons.call),
-              label: const Text(
-                'اتصال',
-                style: TextStyle(
-                  fontFamily: 'Tajawal',
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+      child: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Contact buttons
+            Row(
+              children: [
+                // Call button
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => _makePhoneCall(_agency!.phone),
+                    icon: const Icon(Icons.call),
+                    label: const Text(
+                      'اتصال',
+                      style: TextStyle(fontFamily: 'Tajawal'),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                const SizedBox(width: 12),
+                // Message button
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      // Handle message action
+                    },
+                    icon: const Icon(Icons.message),
+                    label: const Text(
+                      'رسالة',
+                      style: TextStyle(fontFamily: 'Tajawal'),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).brightness == Brightness.dark
+                          ? AppStyles.darkPrimaryColor
+                          : AppStyles.primaryColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: OutlinedButton.icon(
-              onPressed: () => _sendWhatsApp(_agency!.phone),
-              icon: const Icon(Icons.message),
-              label: const Text(
-                'واتساب',
-                style: TextStyle(
-                  fontFamily: 'Tajawal',
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.green,
-                side: const BorderSide(color: Colors.green),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -1136,7 +1180,7 @@ class _SliverTabBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     return Container(
-      color: Colors.white,
+      color: Theme.of(context).cardColor,
       child: _tabBar,
     );
   }

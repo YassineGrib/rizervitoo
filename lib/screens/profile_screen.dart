@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/profile.dart';
 import '../services/profile_service.dart';
 import '../services/image_picker_service.dart';
+import '../services/theme_service.dart';
 import '../constants/app_styles.dart';
 import 'sign_in_screen.dart';
 
@@ -219,14 +220,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8F9FA),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
           title: const Text(
             'الملف الشخصي',
             style: AppStyles.appBarTitleStyle,
             textAlign: TextAlign.center,
           ),
-          backgroundColor: AppStyles.primaryColor,
+          backgroundColor: Theme.of(context).brightness == Brightness.dark
+              ? AppStyles.darkPrimaryColor
+              : AppStyles.primaryColor,
           elevation: 0,
           actions: [
             if (!_isEditing)
@@ -241,9 +244,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
         body: _isLoading
-            ? const Center(
+            ? Center(
                 child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2E7D32)),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Theme.of(context).brightness == Brightness.dark
+                        ? AppStyles.darkPrimaryColor
+                        : AppStyles.primaryColor,
+                  ),
                 ),
               )
             : SingleChildScrollView(
@@ -261,6 +268,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       
                       const SizedBox(height: 24),
                       
+                      // Settings Card
+                      _buildSettingsCard(),
+                      
+                      const SizedBox(height: 24),
+                      
                       // Action Buttons
                       if (_isEditing) _buildActionButtons(),
                     ],
@@ -275,11 +287,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.black.withOpacity(0.3)
+                : Colors.black.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -295,7 +309,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     CircleAvatar(
                       radius: 50,
-                      backgroundColor: const Color(0xFF2E7D32).withOpacity(0.1),
+                      backgroundColor: Theme.of(context).brightness == Brightness.dark
+                          ? AppStyles.darkPrimaryColor.withOpacity(0.15)
+                          : AppStyles.primaryColor.withOpacity(0.1),
                       backgroundImage: _currentProfile?.avatarUrl != null
                           ? NetworkImage(_currentProfile!.avatarUrl!)
                           : null,
@@ -303,7 +319,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ? Icon(
                               Icons.person,
                               size: 50,
-                              color: const Color(0xFF2E7D32).withOpacity(0.7),
+                              color: Theme.of(context).brightness == Brightness.dark
+                                  ? AppStyles.darkPrimaryColor.withOpacity(0.9)
+                                  : AppStyles.primaryColor.withOpacity(0.7),
                             )
                           : null,
                     ),
@@ -312,8 +330,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       right: 0,
                       child: Container(
                         padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF2E7D32),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? AppStyles.darkPrimaryColor
+                              : AppStyles.primaryColor,
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
@@ -331,11 +351,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 12),
           Text(
             _currentProfile?.fullName ?? 'المستخدم',
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Amiri',
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF2E7D32),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? AppStyles.darkPrimaryColor
+                  : AppStyles.primaryColor,
             ),
           ),
           const SizedBox(height: 4),
@@ -344,7 +366,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 14,
-              color: Colors.grey[600],
+              color: Theme.of(context).textTheme.bodyMedium?.color,
             ),
           ),
         ],
@@ -356,11 +378,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.black.withOpacity(0.3)
+                : Colors.black.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -369,13 +393,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'المعلومات الشخصية',
             style: TextStyle(
               fontFamily: 'Amiri',
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF2E7D32),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? AppStyles.darkPrimaryColor
+                  : AppStyles.primaryColor,
             ),
           ),
           const SizedBox(height: 16),
@@ -434,11 +460,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Tajawal',
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF2E7D32),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? AppStyles.darkPrimaryColor
+                : AppStyles.primaryColor,
           ),
         ),
         const SizedBox(height: 8),
@@ -447,28 +475,50 @@ class _ProfileScreenState extends State<ProfileScreen> {
           enabled: enabled,
           keyboardType: keyboardType,
           validator: validator,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Tajawal',
             fontSize: 16,
+            color: Theme.of(context).textTheme.bodyLarge?.color,
           ),
           decoration: InputDecoration(
             filled: true,
-            fillColor: enabled ? Colors.white : Colors.grey[100],
+            fillColor: enabled 
+                ? Theme.of(context).cardColor 
+                : Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey.shade800
+                    : Colors.grey[100],
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[300]!),
+              borderSide: BorderSide(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey.shade600
+                    : Colors.grey.shade300,
+              ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[300]!),
+              borderSide: BorderSide(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey.shade600
+                    : Colors.grey.shade300,
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF2E7D32), width: 2),
+              borderSide: BorderSide(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? AppStyles.darkPrimaryColor
+                    : AppStyles.primaryColor,
+                width: 2,
+              ),
             ),
             disabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[200]!),
+              borderSide: BorderSide(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey.shade700
+                    : Colors.grey.shade200,
+              ),
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           ),
@@ -481,13 +531,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'تاريخ الميلاد',
           style: TextStyle(
             fontFamily: 'Tajawal',
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF2E7D32),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? AppStyles.darkPrimaryColor
+                : AppStyles.primaryColor,
           ),
         ),
         const SizedBox(height: 8),
@@ -497,8 +549,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: _isEditing ? Colors.white : Colors.grey[100],
-              border: Border.all(color: Colors.grey[300]!),
+              color: _isEditing 
+                  ? Theme.of(context).cardColor 
+                  : Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey.shade800
+                      : Colors.grey[100],
+              border: Border.all(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey.shade600
+                    : Colors.grey.shade300,
+              ),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -511,12 +571,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 16,
-                    color: _selectedDateOfBirth != null ? Colors.black : Colors.grey[600],
+                    color: _selectedDateOfBirth != null 
+                        ? Theme.of(context).textTheme.bodyLarge?.color
+                        : Theme.of(context).textTheme.bodyMedium?.color,
                   ),
                 ),
                 Icon(
                   Icons.calendar_today,
-                  color: Colors.grey[600],
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey.shade400
+                      : Colors.grey.shade600,
                   size: 20,
                 ),
               ],
@@ -531,13 +595,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'اللغة المفضلة',
           style: TextStyle(
             fontFamily: 'Tajawal',
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF2E7D32),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? AppStyles.darkPrimaryColor
+                : AppStyles.primaryColor,
           ),
         ),
         const SizedBox(height: 8),
@@ -553,31 +619,53 @@ class _ProfileScreenState extends State<ProfileScreen> {
               value: value,
               child: Text(
                 _languageNames[value] ?? value,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Tajawal',
                   fontSize: 16,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
                 ),
               ),
             );
           }).toList(),
           decoration: InputDecoration(
             filled: true,
-            fillColor: _isEditing ? Colors.white : Colors.grey[100],
+            fillColor: _isEditing 
+                ? Theme.of(context).cardColor 
+                : Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey.shade800
+                    : Colors.grey[100],
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[300]!),
+              borderSide: BorderSide(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey.shade600
+                    : Colors.grey.shade300,
+              ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[300]!),
+              borderSide: BorderSide(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey.shade600
+                    : Colors.grey.shade300,
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF2E7D32), width: 2),
+              borderSide: BorderSide(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? AppStyles.darkPrimaryColor
+                    : AppStyles.primaryColor,
+                width: 2,
+              ),
             ),
             disabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[200]!),
+              borderSide: BorderSide(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey.shade700
+                    : Colors.grey.shade200,
+              ),
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           ),
@@ -618,7 +706,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: ElevatedButton(
             onPressed: _isSaving ? null : _saveProfile,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF2E7D32),
+              backgroundColor: Theme.of(context).brightness == Brightness.dark
+                  ? AppStyles.darkPrimaryColor
+                  : AppStyles.primaryColor,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
@@ -645,6 +735,202 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
       ],
+    );
+  }
+  
+  Widget _buildSettingsCard() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.black.withOpacity(0.3)
+                : Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'الإعدادات',
+            style: TextStyle(
+              fontFamily: 'Amiri',
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).textTheme.headlineMedium?.color,
+            ),
+          ),
+          const SizedBox(height: 16),
+          
+          // Dark Mode Toggle
+          _buildSettingTile(
+            icon: themeService.isDarkMode ? Icons.dark_mode : Icons.light_mode,
+            title: 'المظهر الداكن',
+            subtitle: themeService.isDarkMode ? 'مفعل' : 'معطل',
+            trailing: Switch(
+              value: themeService.isDarkMode,
+              onChanged: (value) async {
+                await themeService.toggleTheme();
+                setState(() {}); // Rebuild to update UI
+              },
+              activeColor: Theme.of(context).primaryColor,
+            ),
+          ),
+          
+          const Divider(height: 32),
+          
+          // Language Setting (Read-only for now)
+          _buildSettingTile(
+            icon: Icons.language,
+            title: 'اللغة',
+            subtitle: _languageNames[_selectedLanguage] ?? _selectedLanguage,
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              // TODO: Implement language switching dialog
+              _showLanguageDialog();
+            },
+          ),
+          
+          const Divider(height: 32),
+          
+          // About/Help Setting
+          _buildSettingTile(
+            icon: Icons.help_outline,
+            title: 'المساعدة والدعم',
+            subtitle: 'اتصل بنا للحصول على المساعدة',
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              // TODO: Navigate to help/support screen
+              _showComingSoonDialog('المساعدة والدعم');
+            },
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildSettingTile({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    Widget? trailing,
+    VoidCallback? onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                icon,
+                color: Theme.of(context).primaryColor,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).textTheme.bodyLarge?.color,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 14,
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (trailing != null) trailing,
+          ],
+        ),
+      ),
+    );
+  }
+  
+  void _showLanguageDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'اختيار اللغة',
+            style: TextStyle(fontFamily: 'Amiri'),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: _languages.map((language) {
+              return RadioListTile<String>(
+                title: Text(
+                  _languageNames[language] ?? language,
+                  style: const TextStyle(fontFamily: 'Tajawal'),
+                ),
+                value: language,
+                groupValue: _selectedLanguage,
+                onChanged: (value) {
+                  setState(() {
+                    _selectedLanguage = value!;
+                  });
+                  Navigator.of(context).pop();
+                },
+              );
+            }).toList(),
+          ),
+        );
+      },
+    );
+  }
+  
+  void _showComingSoonDialog(String feature) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'قريباً',
+            style: TextStyle(fontFamily: 'Amiri'),
+          ),
+          content: Text(
+            'ميزة "$feature" ستكون متاحة في التحديث القادم.',
+            style: const TextStyle(fontFamily: 'Tajawal'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text(
+                'حسناً',
+                style: TextStyle(fontFamily: 'Tajawal'),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

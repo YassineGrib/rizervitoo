@@ -190,23 +190,21 @@ class _AccommodationsScreenState extends State<AccommodationsScreen> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8F9FA),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Column(
           children: [
             // Custom header with title
             Container(
-padding: EdgeInsets.only(
-                 top: MediaQuery.of(context).padding.top + 3,
-                 left: 10,
-                 right: 10,
-                 bottom: 0,
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).padding.top + 3,
+                left: 10,
+                right: 10,
+                bottom: 0,
               ),
               decoration: BoxDecoration(
-                color: AppStyles.primaryColor,
-                // borderRadius: const BorderRadius.only(
-                //   bottomLeft: Radius.circular(24),
-                //   bottomRight: Radius.circular(24),
-                // ),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? AppStyles.darkPrimaryColor
+                    : AppStyles.primaryColor,
               ),
               child: Row(
                 children: [
@@ -236,18 +234,26 @@ padding: EdgeInsets.only(
             // Search Bar
             Container(
               padding: const EdgeInsets.all(16),
-              color: Colors.white,
+              color: Theme.of(context).cardColor,
               child: TextField(
                 controller: _searchController,
                 textDirection: TextDirection.rtl,
                 decoration: InputDecoration(
                   hintText: 'ابحث عن إقامة...',
-                  hintStyle: AppStyles.subtitleStyle.copyWith(
-                    color: Colors.grey.shade500,
+                  hintStyle: TextStyle(
+                    fontFamily: 'Tajawal',
+                    color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.6),
                   ),
-                  prefixIcon: const Icon(Icons.search, color: Color(0xFF3498DB)),
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? AppStyles.darkPrimaryColor
+                        : AppStyles.primaryColor,
+                  ),
                   filled: true,
-                  fillColor: const Color(0xFFF8F9FA),
+                  fillColor: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[800]
+                      : const Color(0xFFF8F9FA),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -264,9 +270,11 @@ padding: EdgeInsets.only(
             // Content
             Expanded(
               child: _isLoading
-                  ? const Center(
+                  ? Center(
                       child: CircularProgressIndicator(
-                        color: Color(0xFF3498DB),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? AppStyles.darkPrimaryColor
+                            : AppStyles.primaryColor,
                       ),
                     )
                   : _accommodations.isEmpty
@@ -284,7 +292,9 @@ padding: EdgeInsets.only(
               _showFilterBottomSheet();
             }
           },
-          backgroundColor: const Color(0xFF3498DB),
+          backgroundColor: Theme.of(context).brightness == Brightness.dark
+              ? AppStyles.darkPrimaryColor
+              : AppStyles.primaryColor,
           child: const Icon(Icons.filter_list, color: Colors.white),
         ),
       ),
@@ -299,7 +309,9 @@ padding: EdgeInsets.only(
           Icon(
             Icons.home_outlined,
             size: 80,
-            color: Colors.grey.shade400,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[600]
+                : Colors.grey.shade400,
           ),
           const SizedBox(height: 16),
           Text(
@@ -308,7 +320,7 @@ padding: EdgeInsets.only(
               fontFamily: 'Amiri',
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: Colors.grey.shade600,
+              color: Theme.of(context).textTheme.bodyLarge?.color,
             ),
           ),
           const SizedBox(height: 8),
@@ -317,7 +329,7 @@ padding: EdgeInsets.only(
             style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 14,
-              color: Colors.grey.shade500,
+              color: Theme.of(context).textTheme.bodyMedium?.color,
             ),
           ),
         ],
@@ -332,11 +344,13 @@ padding: EdgeInsets.only(
       itemCount: _accommodations.length + (_isLoadingMore ? 1 : 0),
       itemBuilder: (context, index) {
         if (index == _accommodations.length) {
-          return const Center(
+          return Center(
             child: Padding(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: CircularProgressIndicator(
-                color: Color(0xFF3498DB),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? AppStyles.darkPrimaryColor
+                    : AppStyles.primaryColor,
               ),
             ),
           );
@@ -351,111 +365,124 @@ padding: EdgeInsets.only(
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.black.withOpacity(0.3)
+                : Colors.black.withOpacity(0.08),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AccommodationDetailScreen(
-                accommodation: accommodation,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AccommodationDetailScreen(
+                  accommodation: accommodation,
+                ),
               ),
-            ),
-          );
-        },
-        borderRadius: BorderRadius.circular(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(16),
+            );
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Image
+              ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(16),
+                ),
+                child: Container(
+                  height: 200,
+                  width: double.infinity,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[800]
+                      : Colors.grey.shade200,
+                  child: accommodation.images.isNotEmpty
+                      ? Image.network(
+                          accommodation.images.first,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return _buildImagePlaceholder();
+                          },
+                        )
+                      : _buildImagePlaceholder(),
+                ),
               ),
-              child: Container(
-                height: 200,
-                width: double.infinity,
-                color: Colors.grey.shade200,
-                child: accommodation.images.isNotEmpty
-                    ? Image.network(
-                        accommodation.images.first,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return _buildImagePlaceholder();
-                        },
-                      )
-                    : _buildImagePlaceholder(),
-              ),
-            ),
             
-            // Content
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Title and Type
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          accommodation.title,
-                          style: AppStyles.sectionTitleStyle.copyWith(
-                            fontSize: 18,
-                            color: const Color(0xFF2C3E50),
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF3498DB).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          accommodation.typeDisplayName,
-                          style: AppStyles.subtitleStyle.copyWith(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF3498DB),
+              // Content
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Title and Type
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            accommodation.title,
+                            style: TextStyle(
+                              fontFamily: 'Amiri',
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).textTheme.headlineSmall?.color,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: (Theme.of(context).brightness == Brightness.dark
+                                ? AppStyles.darkPrimaryColor
+                                : AppStyles.primaryColor).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            accommodation.typeDisplayName,
+                            style: TextStyle(
+                              fontFamily: 'Tajawal',
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Theme.of(context).brightness == Brightness.dark
+                                  ? AppStyles.darkPrimaryColor
+                                  : AppStyles.primaryColor,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   
                   const SizedBox(height: 8),
                   
                   // Location
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.location_on_outlined,
                         size: 16,
-                        color: Color(0xFF7F8C8D),
+                        color: Theme.of(context).textTheme.bodyMedium?.color,
                       ),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
                           '${accommodation.city}, ${accommodation.state}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'Tajawal',
                             fontSize: 14,
-                            color: Color(0xFF7F8C8D),
+                            color: Theme.of(context).textTheme.bodyMedium?.color,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -469,10 +496,10 @@ padding: EdgeInsets.only(
                   // Guest Info
                   Text(
                     accommodation.guestInfo,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Tajawal',
                       fontSize: 14,
-                      color: Color(0xFF7F8C8D),
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                     ),
                   ),
                   
@@ -492,20 +519,20 @@ padding: EdgeInsets.only(
                           const SizedBox(width: 4),
                           Text(
                             accommodation.rating.toStringAsFixed(1),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Tajawal',
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: Color(0xFF2C3E50),
+                              color: Theme.of(context).textTheme.bodyLarge?.color,
                             ),
                           ),
                           const SizedBox(width: 4),
                           Text(
                             '(${accommodation.totalReviews})',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Tajawal',
                               fontSize: 12,
-                              color: Color(0xFF7F8C8D),
+                              color: Theme.of(context).textTheme.bodyMedium?.color,
                             ),
                           ),
                         ],
@@ -513,6 +540,14 @@ padding: EdgeInsets.only(
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
+                          const Text(
+                            'لكل ليلة',
+                            style: TextStyle(
+                              fontFamily: 'Tajawal',
+                              fontSize: 12,
+                              color: Color(0xFF7F8C8D),
+                            ),
+                          ),
                           Text(
                             accommodation.formattedPrice,
                             style: const TextStyle(
@@ -522,22 +557,14 @@ padding: EdgeInsets.only(
                               color: Color(0xFF27AE60),
                             ),
                           ),
-                          const Text(
-                            'لكل ليلة',
-                            style: TextStyle(
-                              fontFamily: 'Tajawal',
-                              fontSize: 12,
-                              color: Color(0xFF7F8C8D),
-                            ),
-                          ),
                         ],
                       ),
                     ],
                   ),
                 ],
-              ),
-            ),
-          ],
+              ), ),
+            ],
+          ),
         ),
       ),
     );
@@ -545,13 +572,13 @@ padding: EdgeInsets.only(
 
   Widget _buildImagePlaceholder() {
     return Container(
-      color: Colors.grey.shade200,
-      child: const Center(
-        child: Icon(
-          Icons.home_outlined,
-          size: 50,
-          color: Color(0xFF7F8C8D),
-        ),
+      color: Theme.of(context).brightness == Brightness.dark
+          ? Colors.grey[800]
+          : Colors.grey.shade200,
+      child: Icon(
+        Icons.home_outlined,
+        size: 50,
+        color: Theme.of(context).textTheme.bodyMedium?.color,
       ),
     );
   }
@@ -568,9 +595,9 @@ padding: EdgeInsets.only(
   Widget _buildFilterBottomSheet() {
     return Container(
       height: MediaQuery.of(context).size.height * 0.7,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: const BorderRadius.vertical(
           top: Radius.circular(20),
         ),
       ),

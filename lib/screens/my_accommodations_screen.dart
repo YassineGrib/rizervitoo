@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/accommodation.dart';
 import '../services/accommodation_service.dart';
+import '../services/theme_service.dart';
 import '../constants/app_styles.dart';
 import 'add_edit_accommodation_screen.dart';
 
@@ -121,7 +122,7 @@ class _MyAccommodationsScreenState extends State<MyAccommodationsScreen> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8F9FA),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Column(
           children: [
             // Custom Header Section
@@ -133,7 +134,9 @@ class _MyAccommodationsScreenState extends State<MyAccommodationsScreen> {
                  bottom: 0,
                ),
               decoration: BoxDecoration(
-                color: AppStyles.primaryColor,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? AppStyles.darkPrimaryColor
+                    : AppStyles.primaryColor,
                 // borderRadius: const BorderRadius.only(
                 //   bottomLeft: Radius.circular(20),
                 //   bottomRight: Radius.circular(20),
@@ -193,7 +196,9 @@ class _MyAccommodationsScreenState extends State<MyAccommodationsScreen> {
           Icon(
             Icons.home_work_outlined,
             size: 80,
-            color: Colors.grey.shade400,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey.shade600
+                : Colors.grey.shade400,
           ),
           const SizedBox(height: 16),
           Text(
@@ -202,7 +207,7 @@ class _MyAccommodationsScreenState extends State<MyAccommodationsScreen> {
               fontFamily: 'Tajawal',
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: Colors.grey.shade600,
+              color: Theme.of(context).textTheme.bodyLarge?.color,
             ),
           ),
           const SizedBox(height: 8),
@@ -211,7 +216,7 @@ class _MyAccommodationsScreenState extends State<MyAccommodationsScreen> {
             style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 14,
-              color: Colors.grey.shade500,
+              color: Theme.of(context).textTheme.bodyMedium?.color,
             ),
           ),
           const SizedBox(height: 24),
@@ -233,7 +238,9 @@ class _MyAccommodationsScreenState extends State<MyAccommodationsScreen> {
               style: TextStyle(fontFamily: 'Tajawal'),
             ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue.shade600,
+              backgroundColor: Theme.of(context).brightness == Brightness.dark
+                  ? AppStyles.darkPrimaryColor
+                  : Colors.blue.shade600,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
@@ -259,8 +266,9 @@ class _MyAccommodationsScreenState extends State<MyAccommodationsScreen> {
 
   Widget _buildAccommodationCard(Accommodation accommodation) {
     return Card(
+      color: Theme.of(context).cardColor,
       margin: const EdgeInsets.only(bottom: 16),
-      elevation: 2,
+      elevation: Theme.of(context).brightness == Brightness.dark ? 8 : 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
@@ -274,7 +282,9 @@ class _MyAccommodationsScreenState extends State<MyAccommodationsScreen> {
               height: 200,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.grey.shade200,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey.shade800
+                    : Colors.grey.shade200,
               ),
               child: accommodation.images.isNotEmpty
                   ? Image.network(
@@ -282,11 +292,15 @@ class _MyAccommodationsScreenState extends State<MyAccommodationsScreen> {
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
-                          color: Colors.grey.shade200,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey.shade800
+                              : Colors.grey.shade200,
                           child: Icon(
                             Icons.image_not_supported,
                             size: 50,
-                            color: Colors.grey.shade400,
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? Colors.grey.shade600
+                                : Colors.grey.shade400,
                           ),
                         );
                       },
@@ -294,7 +308,9 @@ class _MyAccommodationsScreenState extends State<MyAccommodationsScreen> {
                   : Icon(
                       Icons.home_work,
                       size: 50,
-                      color: Colors.grey.shade400,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey.shade600
+                          : Colors.grey.shade400,
                     ),
             ),
           ),
@@ -310,10 +326,11 @@ class _MyAccommodationsScreenState extends State<MyAccommodationsScreen> {
                     Expanded(
                       child: Text(
                         accommodation.title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
+                          color: Theme.of(context).textTheme.headlineSmall?.color,
                         ),
                       ),
                     ),
@@ -375,7 +392,9 @@ class _MyAccommodationsScreenState extends State<MyAccommodationsScreen> {
                     Icon(
                       Icons.location_on,
                       size: 16,
-                      color: Colors.grey.shade600,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey.shade400
+                          : Colors.grey.shade600,
                     ),
                     const SizedBox(width: 4),
                     Expanded(
@@ -384,7 +403,7 @@ class _MyAccommodationsScreenState extends State<MyAccommodationsScreen> {
                         style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 14,
-                          color: Colors.grey.shade600,
+                          color: Theme.of(context).textTheme.bodyMedium?.color,
                         ),
                       ),
                     ),
@@ -395,19 +414,21 @@ class _MyAccommodationsScreenState extends State<MyAccommodationsScreen> {
                   children: [
                     Text(
                       '${accommodation.pricePerNight.toStringAsFixed(0)} دج',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.blue,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? AppStyles.darkPrimaryColor
+                            : Colors.blue,
                       ),
                     ),
-                    const Text(
+                    Text(
                       ' / ليلة',
                       style: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 14,
-                        color: Colors.grey,
+                        color: Theme.of(context).textTheme.bodyMedium?.color,
                       ),
                     ),
                     const Spacer(),

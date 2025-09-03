@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/accommodation.dart';
 import '../models/booking.dart';
 import '../services/booking_service.dart';
+import '../constants/app_styles.dart';
 
 class AccommodationDetailScreen extends StatefulWidget {
   final Accommodation accommodation;
@@ -31,15 +32,17 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: CustomScrollView(
           slivers: [
             // App Bar with Images
             SliverAppBar(
               expandedHeight: 300,
               pinned: true,
-              backgroundColor: Colors.white,
-              foregroundColor: const Color(0xFF2C3E50),
+              backgroundColor: Theme.of(context).brightness == Brightness.dark
+                  ? AppStyles.darkPrimaryColor
+                  : AppStyles.primaryColor,
+              foregroundColor: Colors.white,
               flexibleSpace: FlexibleSpaceBar(
                 background: _buildImageGallery(),
               ),
@@ -58,10 +61,10 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                         Expanded(
                           child: Text(
                             widget.accommodation.title,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF2C3E50),
+                              color: Theme.of(context).textTheme.headlineSmall?.color,
                               fontFamily: 'Amiri',
                             ),
                           ),
@@ -72,15 +75,19 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF3498DB).withOpacity(0.1),
+                            color: (Theme.of(context).brightness == Brightness.dark
+                                ? AppStyles.darkPrimaryColor
+                                : AppStyles.primaryColor).withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
                             widget.accommodation.typeDisplayName,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: Color(0xFF3498DB),
+                              color: Theme.of(context).brightness == Brightness.dark
+                                  ? AppStyles.darkPrimaryColor
+                                  : AppStyles.primaryColor,
                               fontFamily: 'Tajawal',
                             ),
                           ),
@@ -93,18 +100,20 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                     // Location
                     Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.location_on,
                           size: 20,
-                          color: Color(0xFF3498DB),
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? AppStyles.darkPrimaryColor
+                              : AppStyles.primaryColor,
                         ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             widget.accommodation.address,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
-                              color: Color(0xFF7F8C8D),
+                              color: Theme.of(context).textTheme.bodyMedium?.color,
                             ),
                           ),
                         ),
@@ -115,9 +124,9 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                     
                     Text(
                       '${widget.accommodation.city}, ${widget.accommodation.state}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
-                        color: Color(0xFF7F8C8D),
+                        color: Theme.of(context).textTheme.bodyMedium?.color,
                         fontFamily: 'Tajawal',
                       ),
                     ),
@@ -159,9 +168,9 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                         const SizedBox(width: 12),
                         Text(
                           '${widget.accommodation.totalReviews} تقييم',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
-                            color: Color(0xFF7F8C8D),
+                            color: Theme.of(context).textTheme.bodyMedium?.color,
                           ),
                         ),
                       ],
@@ -202,21 +211,21 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                     
                     // Description
                     if (widget.accommodation.description != null) ...[
-                      const Text(
+                      Text(
                         'الوصف',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF2C3E50),
+                          color: Theme.of(context).textTheme.headlineSmall?.color,
                           fontFamily: 'Amiri',
                         ),
                       ),
                       const SizedBox(height: 12),
                       Text(
                         widget.accommodation.description!,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
-                          color: Color(0xFF7F8C8D),
+                          color: Theme.of(context).textTheme.bodyMedium?.color,
                           height: 1.5,
                           fontFamily: 'Tajawal',
                         ),
@@ -226,12 +235,12 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                     
                     // Amenities
                     if (widget.accommodation.amenities.isNotEmpty) ...[
-                      const Text(
+                      Text(
                         'المرافق والخدمات',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF2C3E50),
+                          color: Theme.of(context).textTheme.headlineSmall?.color,
                           fontFamily: 'Amiri',
                         ),
                       ),
@@ -271,10 +280,14 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF8F9FA),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.grey[800]
+                            : const Color(0xFFF8F9FA),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: Colors.grey.shade200,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey[700]!
+                              : Colors.grey.shade200,
                         ),
                       ),
                       child: Row(
@@ -307,7 +320,9 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                               _showBookingDialog();
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF3498DB),
+                              backgroundColor: Theme.of(context).brightness == Brightness.dark
+                                  ? AppStyles.darkPrimaryColor
+                                  : const Color(0xFF3498DB),
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 24,
@@ -416,10 +431,14 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8F9FA),
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.grey[800]
+            : const Color(0xFFF8F9FA),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.grey.shade200,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.grey[700]!
+              : Colors.grey.shade200,
         ),
       ),
       child: Column(
@@ -427,23 +446,25 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
           Icon(
             icon,
             size: 24,
-            color: const Color(0xFF3498DB),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? AppStyles.darkPrimaryColor
+                : AppStyles.primaryColor,
           ),
           const SizedBox(height: 8),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF2C3E50),
+              color: Theme.of(context).textTheme.headlineSmall?.color,
               fontFamily: 'Tajawal',
             ),
           ),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
-              color: Color(0xFF7F8C8D),
+              color: Theme.of(context).textTheme.bodyMedium?.color,
               fontFamily: 'Tajawal',
             ),
           ),
@@ -463,11 +484,12 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
         builder: (context, setState) => Directionality(
           textDirection: TextDirection.rtl,
           child: AlertDialog(
-            title: const Text(
+            backgroundColor: Theme.of(context).cardColor,
+            title: Text(
               'حجز الإقامة',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF2C3E50),
+                color: Theme.of(context).textTheme.headlineSmall?.color,
                 fontFamily: 'Amiri',
               ),
             ),
@@ -478,21 +500,21 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                 children: [
                   Text(
                     'تفاصيل الحجز لـ "${widget.accommodation.title}"',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
-                      color: Color(0xFF7F8C8D),
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                       fontFamily: 'Tajawal',
                     ),
                   ),
                   const SizedBox(height: 20),
                   
                   // Check-in Date
-                  const Text(
+                  Text(
                     'تاريخ الوصول:',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF2C3E50),
+                      color: Theme.of(context).textTheme.headlineSmall?.color,
                       fontFamily: 'Tajawal',
                     ),
                   ),
@@ -515,8 +537,15 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade300),
+                        border: Border.all(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey[600]!
+                              : Colors.grey.shade300,
+                        ),
                         borderRadius: BorderRadius.circular(8),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.grey[800]
+                            : Colors.white,
                       ),
                       child: Text(
                         checkInDate != null
@@ -524,7 +553,9 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                             : 'اختر تاريخ الوصول',
                         style: TextStyle(
                           fontSize: 14,
-                          color: checkInDate != null ? const Color(0xFF2C3E50) : const Color(0xFF7F8C8D),
+                          color: checkInDate != null 
+                              ? Theme.of(context).textTheme.bodyLarge?.color 
+                              : Theme.of(context).textTheme.bodyMedium?.color,
                           fontFamily: 'Tajawal',
                         ),
                       ),
@@ -533,12 +564,12 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                   const SizedBox(height: 16),
                   
                   // Check-out Date
-                  const Text(
+                  Text(
                     'تاريخ المغادرة:',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF2C3E50),
+                      color: Theme.of(context).textTheme.headlineSmall?.color,
                       fontFamily: 'Tajawal',
                     ),
                   ),
@@ -561,8 +592,15 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade300),
+                        border: Border.all(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey[600]!
+                              : Colors.grey.shade300,
+                        ),
                         borderRadius: BorderRadius.circular(8),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.grey[800]
+                            : Colors.white,
                       ),
                       child: Text(
                         checkOutDate != null
@@ -570,7 +608,9 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                             : 'اختر تاريخ المغادرة',
                         style: TextStyle(
                           fontSize: 14,
-                          color: checkOutDate != null ? const Color(0xFF2C3E50) : const Color(0xFF7F8C8D),
+                          color: checkOutDate != null 
+                              ? Theme.of(context).textTheme.bodyLarge?.color 
+                              : Theme.of(context).textTheme.bodyMedium?.color,
                           fontFamily: 'Tajawal',
                         ),
                       ),
@@ -579,12 +619,12 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                   const SizedBox(height: 16),
                   
                   // Guest Count
-                  const Text(
+                  Text(
                     'عدد الضيوف:',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF2C3E50),
+                      color: Theme.of(context).textTheme.headlineSmall?.color,
                       fontFamily: 'Tajawal',
                     ),
                   ),
@@ -598,16 +638,18 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                           });
                         } : null,
                         icon: const Icon(Icons.remove_circle_outline),
-                        color: const Color(0xFF3498DB),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? AppStyles.darkPrimaryColor
+                            : const Color(0xFF3498DB),
                       ),
                       Expanded(
                         child: Text(
                           '$guestCount ضيف',
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF2C3E50),
+                            color: Theme.of(context).textTheme.headlineSmall?.color,
                             fontFamily: 'Tajawal',
                           ),
                         ),
@@ -619,7 +661,9 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                           });
                         } : null,
                         icon: const Icon(Icons.add_circle_outline),
-                        color: const Color(0xFF3498DB),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? AppStyles.darkPrimaryColor
+                            : const Color(0xFF3498DB),
                       ),
                     ],
                   ),
@@ -630,7 +674,9 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF8F9FA),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.grey[800]
+                            : const Color(0xFFF8F9FA),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Column(
@@ -638,20 +684,20 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
+                              Text(
                                 'عدد الليالي:',
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Color(0xFF7F8C8D),
+                                  color: Theme.of(context).textTheme.bodyMedium?.color,
                                   fontFamily: 'Tajawal',
                                 ),
                               ),
                               Text(
                                 '${checkOutDate!.difference(checkInDate!).inDays} ليلة',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
-                                  color: Color(0xFF2C3E50),
+                                  color: Theme.of(context).textTheme.headlineSmall?.color,
                                   fontFamily: 'Tajawal',
                                 ),
                               ),
@@ -661,11 +707,11 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
+                              Text(
                                 'السعر الإجمالي:',
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Color(0xFF7F8C8D),
+                                  color: Theme.of(context).textTheme.bodyMedium?.color,
                                   fontFamily: 'Tajawal',
                                 ),
                               ),
@@ -689,10 +735,10 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text(
+                child: Text(
                   'إلغاء',
                   style: TextStyle(
-                    color: Color(0xFF7F8C8D),
+                    color: Theme.of(context).textTheme.bodyMedium?.color,
                     fontFamily: 'Tajawal',
                   ),
                 ),
@@ -703,7 +749,9 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                   _showBookingConfirmation(checkInDate!, checkOutDate!, guestCount);
                 } : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF3498DB),
+                  backgroundColor: Theme.of(context).brightness == Brightness.dark
+                      ? AppStyles.darkPrimaryColor
+                      : const Color(0xFF3498DB),
                   foregroundColor: Colors.white,
                 ),
                 child: const Text(
@@ -730,16 +778,22 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
       barrierDismissible: false,
       builder: (context) => Directionality(
         textDirection: TextDirection.rtl,
-        child: const AlertDialog(
+        child: AlertDialog(
+          backgroundColor: Theme.of(context).cardColor,
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
+              CircularProgressIndicator(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? AppStyles.darkPrimaryColor
+                    : AppStyles.primaryColor,
+              ),
+              const SizedBox(height: 16),
               Text(
                 'جاري حفظ الحجز...',
                 style: TextStyle(
                   fontFamily: 'Tajawal',
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
                 ),
               ),
             ],
@@ -770,6 +824,7 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
         builder: (context) => Directionality(
           textDirection: TextDirection.rtl,
           child: AlertDialog(
+            backgroundColor: Theme.of(context).cardColor,
             title: const Text(
               'تم الحجز بنجاح!',
               style: TextStyle(
@@ -792,53 +847,59 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                   'تم حفظ حجزك بنجاح!',
                   style: TextStyle(
                     fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2C3E50),
-                  fontFamily: 'Amiri',
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2C3E50),
+                    fontFamily: 'Amiri',
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF8F9FA),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey.shade200),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'تفاصيل الحجز:',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF2C3E50),
-                        fontFamily: 'Tajawal',
-                      ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey[800]
+                        : const Color(0xFFF8F9FA),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey[700]!
+                          : Colors.grey.shade200,
                     ),
-                    const SizedBox(height: 12),
-                    _buildBookingDetail('الإقامة:', widget.accommodation.title),
-                    _buildBookingDetail('تاريخ الوصول:', '${checkIn.day}/${checkIn.month}/${checkIn.year}'),
-                    _buildBookingDetail('تاريخ المغادرة:', '${checkOut.day}/${checkOut.month}/${checkOut.year}'),
-                    _buildBookingDetail('عدد الليالي:', '$nights ليلة'),
-                    _buildBookingDetail('عدد الضيوف:', '$guests ضيف'),
-                    const Divider(),
-                    _buildBookingDetail('السعر الإجمالي:', '${totalPrice.toStringAsFixed(0)} دج', isTotal: true),
-                  ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'تفاصيل الحجز:',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).textTheme.headlineSmall?.color,
+                          fontFamily: 'Tajawal',
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      _buildBookingDetail('الإقامة:', widget.accommodation.title),
+                      _buildBookingDetail('تاريخ الوصول:', '${checkIn.day}/${checkIn.month}/${checkIn.year}'),
+                      _buildBookingDetail('تاريخ المغادرة:', '${checkOut.day}/${checkOut.month}/${checkOut.year}'),
+                      _buildBookingDetail('عدد الليالي:', '$nights ليلة'),
+                      _buildBookingDetail('عدد الضيوف:', '$guests ضيف'),
+                      const Divider(),
+                      _buildBookingDetail('السعر الإجمالي:', '${totalPrice.toStringAsFixed(0)} دج', isTotal: true),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'سيتم التواصل معك قريباً لتأكيد الحجز وترتيب تفاصيل الدفع.',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF7F8C8D),
-                  fontFamily: 'Tajawal',
+                const SizedBox(height: 16),
+                const Text(
+                  'سيتم التواصل معك قريباً لتأكيد الحجز وترتيب تفاصيل الدفع.',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF7F8C8D),
+                    fontFamily: 'Tajawal',
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
           actions: [
             ElevatedButton(
               onPressed: () => Navigator.pop(context),
@@ -867,6 +928,7 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
         builder: (context) => Directionality(
           textDirection: TextDirection.rtl,
           child: AlertDialog(
+            backgroundColor: Theme.of(context).cardColor,
             title: const Text(
               'خطأ في الحجز',
               style: TextStyle(
@@ -886,9 +948,9 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
                 const SizedBox(height: 16),
                 Text(
                   'حدث خطأ أثناء حفظ الحجز: ${e.toString()}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
-                    color: Color(0xFF2C3E50),
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
                     fontFamily: 'Tajawal',
                   ),
                 ),
@@ -928,7 +990,7 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
               style: TextStyle(
                 fontSize: isTotal ? 16 : 14,
                 fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
-                color: const Color(0xFF7F8C8D),
+                color: Theme.of(context).textTheme.bodyMedium?.color,
                 fontFamily: 'Tajawal',
               ),
             ),
@@ -942,7 +1004,7 @@ class _AccommodationDetailScreenState extends State<AccommodationDetailScreen> {
               style: TextStyle(
                 fontSize: isTotal ? 16 : 14,
                 fontWeight: isTotal ? FontWeight.bold : FontWeight.w600,
-                color: isTotal ? const Color(0xFF27AE60) : const Color(0xFF2C3E50),
+                color: isTotal ? const Color(0xFF27AE60) : Theme.of(context).textTheme.headlineSmall?.color,
                 fontFamily: 'Tajawal',
               ),
             ),

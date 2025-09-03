@@ -10,6 +10,7 @@ import 'package:rizervitoo/screens/travel_agencies/travel_agencies_screen.dart';
 import 'package:rizervitoo/screens/notifications_screen.dart';
 import 'package:rizervitoo/services/booking_service.dart';
 import 'package:rizervitoo/services/notification_service.dart';
+import 'package:rizervitoo/services/theme_service.dart';
 import 'package:rizervitoo/models/booking.dart';
 import 'package:rizervitoo/constants/app_styles.dart';
 import 'package:intl/intl.dart';
@@ -172,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       appBar: (_selectedIndex == 1 || _selectedIndex == 2)
           ? null
           : AppBar(
-              backgroundColor: Colors.white,
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               elevation: 0,
               automaticallyImplyLeading: false,
               title: Row(
@@ -183,7 +184,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       Navigator.pushNamed(context, '/admin-login');
                     },
                     child: Image.asset(
-                      'assest/images/logo_blue.png',
+                      Theme.of(context).brightness == Brightness.dark
+                          ? 'assest/images/logo_white.png'
+                          : 'assest/images/logo_blue.png',
                       height: 32,
                     ),
                   ),
@@ -191,12 +194,32 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   Text(
                     'Rizervitoo',
                     style: AppStyles.appBarTitleStyle.copyWith(
-                      color: Colors.blue,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? AppStyles.darkTextPrimaryColor
+                          : AppStyles.primaryColor,
                     ),
                   ),
                 ],
               ),
               actions: [
+                // Theme toggle button
+                IconButton(
+                  onPressed: () {
+                    themeService.toggleTheme();
+                  },
+                  icon: Icon(
+                    Theme.of(context).brightness == Brightness.dark
+                        ? Icons.light_mode
+                        : Icons.dark_mode,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? AppStyles.darkTextPrimaryColor
+                        : Colors.grey.shade700,
+                    size: 24,
+                  ),
+                  tooltip: Theme.of(context).brightness == Brightness.dark
+                      ? 'الوضع النهاري'
+                      : 'الوضع الليلي',
+                ),
                 Stack(
                   children: [
                     IconButton(
@@ -212,7 +235,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       },
                       icon: Icon(
                         Icons.notifications_outlined,
-                        color: Colors.grey.shade700,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? AppStyles.darkTextPrimaryColor
+                            : Colors.grey.shade700,
                         size: 24,
                       ),
                     ),
@@ -257,10 +282,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       body: _getSelectedScreen(),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? AppStyles.darkSurfaceColor
+              : Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.black.withOpacity(0.3)
+                  : Colors.black.withOpacity(0.1),
               blurRadius: 20,
               offset: const Offset(0, -5),
             ),
@@ -278,8 +307,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           child: BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
             backgroundColor: Colors.transparent,
-            selectedItemColor: AppStyles.primaryColor,
-            unselectedItemColor: Colors.grey.shade500,
+            selectedItemColor: Theme.of(context).brightness == Brightness.dark
+                ? AppStyles.darkPrimaryColor
+                : AppStyles.primaryColor,
+            unselectedItemColor: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey.shade400
+                : Colors.grey.shade500,
             selectedLabelStyle: AppStyles.buttonTextStyle.copyWith(
               fontWeight: FontWeight.bold,
               fontSize: 12,
@@ -324,12 +357,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     int index,
   ) {
     final isSelected = _selectedIndex == index;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: isSelected
-            ? AppStyles.primaryColor.withOpacity(0.1)
+            ? (isDark
+                ? AppStyles.darkPrimaryColor.withOpacity(0.15)
+                : AppStyles.primaryColor.withOpacity(0.1))
             : Colors.transparent,
         borderRadius: BorderRadius.circular(12),
       ),
@@ -354,12 +390,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppStyles.primaryColor.withOpacity(0.1),
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? AppStyles.darkPrimaryColor.withOpacity(0.15)
+                      : AppStyles.primaryColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   Icons.flash_on,
-                  color: AppStyles.primaryColor,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? AppStyles.darkPrimaryColor
+                      : AppStyles.primaryColor,
                   size: 20,
                 ),
               ),
@@ -370,7 +410,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   fontFamily: 'Amiri',
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.grey.shade800,
+                  color: Theme.of(context).textTheme.headlineSmall?.color,
                 ),
               ),
             ],
@@ -399,10 +439,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.1),
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.orange.withOpacity(0.15)
+                      : Colors.orange.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(Icons.history, color: Colors.orange, size: 20),
+                child: Icon(
+                  Icons.history,
+                  color: Colors.orange,
+                  size: 20,
+                ),
               ),
               const SizedBox(width: 12),
               Text(
@@ -411,7 +457,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   fontFamily: 'Amiri',
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.grey.shade800,
+                  color: Theme.of(context).textTheme.headlineSmall?.color,
                 ),
               ),
             ],
@@ -431,11 +477,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       return Container(
         padding: const EdgeInsets.all(32),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.black.withOpacity(0.3)
+                  : Colors.black.withOpacity(0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -449,11 +497,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.black.withOpacity(0.3)
+                  : Colors.black.withOpacity(0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -461,14 +511,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         ),
         child: Column(
           children: [
-            Icon(Icons.bookmark_border, size: 48, color: Colors.grey.shade400),
+            Icon(
+              Icons.bookmark_border,
+              size: 48,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.grey.shade600
+                  : Colors.grey.shade400,
+            ),
             const SizedBox(height: 12),
             Text(
               'لا توجد حجوزات حتى الآن',
               style: TextStyle(
                 fontFamily: 'Tajawal',
                 fontSize: 16,
-                color: Colors.grey.shade600,
+                color: Theme.of(context).textTheme.bodyMedium?.color,
               ),
             ),
             const SizedBox(height: 8),
@@ -477,7 +533,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               style: TextStyle(
                 fontFamily: 'Tajawal',
                 fontSize: 14,
-                color: Colors.grey.shade500,
+                color: Theme.of(context).textTheme.bodySmall?.color,
               ),
             ),
           ],
@@ -502,11 +558,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.black.withOpacity(0.3)
+                : Colors.black.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),

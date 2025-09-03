@@ -184,7 +184,9 @@ class _TravelAgenciesScreenState extends State<TravelAgenciesScreen>
           ),
         ),
         // backgroundColor: Theme.of(context).primaryColor,
-        backgroundColor: AppStyles.primaryColor,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? AppStyles.darkPrimaryColor
+            : AppStyles.primaryColor,
         foregroundColor: Colors.white,
         elevation: 0,
         bottom: TabBar(
@@ -298,9 +300,15 @@ class _TravelAgenciesScreenState extends State<TravelAgenciesScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.grey[850]
+            : Colors.grey[50],
         border: Border(
-          bottom: BorderSide(color: Colors.grey[200]!),
+          bottom: BorderSide(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[700]!
+                : Colors.grey[200]!,
+          ),
         ),
       ),
       child: Column(
@@ -326,7 +334,7 @@ class _TravelAgenciesScreenState extends State<TravelAgenciesScreen>
                 borderSide: BorderSide.none,
               ),
               filled: true,
-              fillColor: Colors.white,
+              fillColor: Theme.of(context).cardColor,
             ),
             onSubmitted: (_) => _searchAgencies(),
           ),
@@ -503,107 +511,115 @@ class _TravelAgenciesScreenState extends State<TravelAgenciesScreen>
 
   Widget _buildAgencyCard(TravelAgency agency, {bool isFeatured = false}) {
     return Card(
+      color: Theme.of(context).cardColor,
       margin: const EdgeInsets.only(bottom: 16),
-      elevation: isFeatured ? 4 : 2,
+      elevation: Theme.of(context).brightness == Brightness.dark ? 8 : (isFeatured ? 4 : 2),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: isFeatured
             ? BorderSide(color: Colors.amber, width: 2)
             : BorderSide.none,
       ),
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => TravelAgencyDetailsScreen(agencyId: agency.id),
-            ),
-          );
-        },
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header with name and verification
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      agency.name,
-                      style: const TextStyle(
-                        fontFamily: 'Amiri',
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  if (agency.isVerified)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.blue[50],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.verified,
-                            size: 14,
-                            color: Colors.blue[600],
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'معتمدة',
-                            style: TextStyle(
-                              fontFamily: 'Tajawal',
-                              fontSize: 12,
-                              color: Colors.blue[600],
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  if (isFeatured)
-                    Container(
-                      margin: const EdgeInsets.only(left: 8),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.amber[50],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.star,
-                            size: 14,
-                            color: Colors.amber[600],
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'مميزة',
-                            style: TextStyle(
-                              fontFamily: 'Tajawal',
-                              fontSize: 12,
-                              color: Colors.amber[700],
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                ],
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => TravelAgencyDetailsScreen(agencyId: agency.id),
               ),
+            );
+          },
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header with name and verification
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        agency.name,
+                        style: TextStyle(
+                          fontFamily: 'Amiri',
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).textTheme.headlineSmall?.color,
+                        ),
+                      ),
+                    ),
+                    if (agency.isVerified)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.blue.withOpacity(0.2)
+                              : Colors.blue[50],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.verified,
+                              size: 14,
+                              color: Colors.blue[600],
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'معتمدة',
+                              style: TextStyle(
+                                fontFamily: 'Tajawal',
+                                fontSize: 12,
+                                color: Colors.blue[600],
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    if (isFeatured)
+                      Container(
+                        margin: const EdgeInsets.only(left: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.amber.withOpacity(0.2)
+                              : Colors.amber[50],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.star,
+                              size: 14,
+                              color: Colors.amber[600],
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'مميزة',
+                              style: TextStyle(
+                                fontFamily: 'Tajawal',
+                                fontSize: 12,
+                                color: Colors.amber[700],
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
               const SizedBox(height: 8),
               // Location and contact
               Row(
@@ -632,7 +648,7 @@ class _TravelAgenciesScreenState extends State<TravelAgenciesScreen>
                   Icon(
                     Icons.phone,
                     size: 16,
-                    color: Colors.grey[600],
+                    color: Theme.of(context).textTheme.bodyMedium?.color,
                   ),
                   const SizedBox(width: 4),
                   Text(
@@ -640,7 +656,7 @@ class _TravelAgenciesScreenState extends State<TravelAgenciesScreen>
                     style: TextStyle(
                       fontFamily: 'Tajawal',
                       fontSize: 14,
-                      color: Colors.grey[600],
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                     ),
                   ),
                   const Spacer(),
@@ -660,7 +676,7 @@ class _TravelAgenciesScreenState extends State<TravelAgenciesScreen>
                   style: TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 14,
-                    color: Colors.grey[700],
+                    color: Theme.of(context).textTheme.bodyMedium?.color,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -681,10 +697,11 @@ class _TravelAgenciesScreenState extends State<TravelAgenciesScreen>
                       const SizedBox(width: 4),
                       Text(
                         agency.rating.toStringAsFixed(1),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
+                          color: Theme.of(context).textTheme.bodyLarge?.color,
                         ),
                       ),
                       const SizedBox(width: 4),
@@ -710,7 +727,9 @@ class _TravelAgenciesScreenState extends State<TravelAgenciesScreen>
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).primaryColor.withOpacity(0.1),
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? AppStyles.darkPrimaryColor.withOpacity(0.2)
+                                : AppStyles.primaryColor.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -718,7 +737,9 @@ class _TravelAgenciesScreenState extends State<TravelAgenciesScreen>
                             style: TextStyle(
                               fontFamily: 'Tajawal',
                               fontSize: 10,
-                              color: Theme.of(context).primaryColor,
+                              color: Theme.of(context).brightness == Brightness.dark
+                                  ? AppStyles.darkPrimaryColor
+                                  : AppStyles.primaryColor,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -731,6 +752,7 @@ class _TravelAgenciesScreenState extends State<TravelAgenciesScreen>
           ),
         ),
       ),
+        ),
     );
   }
 

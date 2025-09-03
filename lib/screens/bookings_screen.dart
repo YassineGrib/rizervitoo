@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/booking.dart';
 import '../services/booking_service.dart';
+import '../services/theme_service.dart';
 import '../constants/app_styles.dart';
 import 'modify_booking_screen.dart';
 import '../widgets/booking_cancellation_dialog.dart';
@@ -64,7 +65,7 @@ class _BookingsScreenState extends State<BookingsScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.grey[50],
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Column(
           children: [
             // Custom header with title and tabs
@@ -76,7 +77,9 @@ padding: EdgeInsets.only(
                  bottom: 0,
               ),
               decoration: BoxDecoration(
-                color: AppStyles.primaryColor,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? AppStyles.darkPrimaryColor
+                    : AppStyles.primaryColor,
                 // borderRadius: const BorderRadius.only(
                 //   bottomLeft: Radius.circular(24),
                 //   bottomRight: Radius.circular(24),
@@ -140,9 +143,11 @@ padding: EdgeInsets.only(
             // Content
              Expanded(
                child: _isLoading
-            ? const Center(
+            ? Center(
                 child: CircularProgressIndicator(
-                  color: Color(0xFF2E7D32),
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? AppStyles.darkPrimaryColor
+                      : AppStyles.primaryColor,
                 ),
               )
             : _error != null
@@ -167,26 +172,32 @@ padding: EdgeInsets.only(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
+            Icon(
               Icons.error_outline,
               size: 64,
-              color: Colors.red,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.red.shade300
+                  : Colors.red,
             ),
             const SizedBox(height: 16),
             Text(
               _error!,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Tajawal',
                 fontSize: 16,
-                color: Colors.red,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.red.shade300
+                    : Colors.red,
               ),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _loadBookings,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2E7D32),
+                backgroundColor: Theme.of(context).brightness == Brightness.dark
+                    ? AppStyles.darkPrimaryColor
+                    : AppStyles.primaryColor,
                 foregroundColor: Colors.white,
               ),
               child: const Text(
