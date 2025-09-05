@@ -29,103 +29,109 @@ class HelpSupportScreen extends StatelessWidget {
               : AppStyles.primaryColor,
           elevation: 0,
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              // FAQ Section
-              _buildSectionCard(
-                context,
-                title: 'الأسئلة الشائعة',
-                icon: Icons.question_answer,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _buildFAQItem(
+                  // FAQ Section
+                  _buildSectionCard(
                     context,
-                    'كيف أقوم بحجز إقامة؟',
-                    'للحجز، ابحث عن الإقامة التي تريدها، اختر تواريخ الحجز، واملأ معلومات الضيوف، ثم اضغط على "احجز الآن".',
+                    title: 'الأسئلة الشائعة',
+                    icon: Icons.question_answer,
+                    children: [
+                      _buildFAQItem(
+                        context,
+                        'كيف أقوم بحجز إقامة؟',
+                        'للحجز، ابحث عن الإقامة التي تريدها، اختر تواريخ الحجز، واملأ معلومات الضيوف، ثم اضغط على "احجز الآن".',
+                      ),
+                      _buildFAQItem(
+                        context,
+                        'ما هي سياسة الإلغاء؟',
+                        'تختلف سياسة الإلغاء حسب نوع الحجز وسياسة المضيف. تظهر تفاصيل سياسة الإلغاء قبل تأكيد الحجز.',
+                      ),
+                      _buildFAQItem(
+                        context,
+                        'كيف أضيف تقييم لإقامة؟',
+                        'بعد إكمال الحجز، يمكنك إضافة تقييم من خلال صفحة الحجوزات الخاصة بك.',
+                      ),
+                      _buildFAQItem(
+                        context,
+                        'كيف أتواصل مع المضيف؟',
+                        'يمكنك استخدام نموذج التواصل في صفحة الإقامة أو من خلال صفحة الرسائل في حسابك.',
+                      ),
+                    ],
                   ),
-                  _buildFAQItem(
+                  
+                  const SizedBox(height: 20),
+                  
+                  // Contact Support Section
+                  _buildSectionCard(
                     context,
-                    'ما هي سياسة الإلغاء؟',
-                    'تختلف سياسة الإلغاء حسب نوع الحجز وسياسة المضيف. تظهر تفاصيل سياسة الإلغاء قبل تأكيد الحجز.',
+                    title: 'اتصل بالدعم',
+                    icon: Icons.support_agent,
+                    children: [
+                      _buildContactItem(
+                        context,
+                        Icons.email,
+                        'البريد الإلكتروني',
+                        'support@rizervitoo.com',
+                        () => _launchEmail(context),
+                      ),
+                      _buildContactItem(
+                        context,
+                        Icons.phone,
+                        'رقم الهاتف',
+                        '+213 555 555 555',
+                        () => _launchPhone(context),
+                      ),
+                      _buildContactItem(
+                        context,
+                        Icons.chat_bubble_outline,
+                        'الدردشة المباشرة',
+                        'متوفرة من 9 صباحاً إلى 5 مساءً',
+                        () => _launchChat(context),
+                      ),
+                    ],
                   ),
-                  _buildFAQItem(
-                    context,
-                    'كيف أضيف تقييم لإقامة؟',
-                    'بعد إكمال الحجز، يمكنك إضافة تقييم من خلال صفحة الحجوزات الخاصة بك.',
-                  ),
-                  _buildFAQItem(
-                    context,
-                    'كيف أتواصل مع المضيف؟',
-                    'يمكنك استخدام نموذج التواصل في صفحة الإقامة أو من خلال صفحة الرسائل في حسابك.',
-                  ),
+                  
+                  const SizedBox(height: 20),
+                  
+                  // Help Resources Section
+                  // _buildSectionCard(
+                  //   context,
+                  //   title: 'مصادر المساعدة',
+                  //   icon: Icons.school,
+                  //   children: [
+                  //     _buildResourceItem(
+                  //       context,
+                  //       Icons.book,
+                  //       'الدليل الكامل للاستخدام',
+                  //       'تعليمات مفصلة حول كيفية استخدام جميع ميزات التطبيق.',
+                  //       () => _openGuide(context),
+                  //     ),
+                  //     _buildResourceItem(
+                  //       context,
+                  //       Icons.policy,
+                  //       'سياسات الموقع',
+                  //       'تفاصيل سياسات الخصوصية، الإلغاء، والشروط والأحكام.',
+                  //       () => _openPolicies(context),
+                  //     ),
+                  //     _buildResourceItem(
+                  //       context,
+                  //       Icons.chat,
+                  //       'مدونة المساعدة',
+                  //       'نصائح واستراتيجيات لتحسين تجربة استخدام التطبيق.',
+                  //       () => _openBlog(context),
+                  //     ),
+                  //   ],
+                  // ),
                 ],
               ),
-              
-              const SizedBox(height: 20),
-              
-              // Contact Support Section
-              _buildSectionCard(
-                context,
-                title: 'اتصل بالدعم',
-                icon: Icons.support_agent,
-                children: [
-                  _buildContactItem(
-                    context,
-                    Icons.email,
-                    'البريد الإلكتروني',
-                    'support@rizervitoo.com',
-                    () => _launchEmail(context),
-                  ),
-                  _buildContactItem(
-                    context,
-                    Icons.phone,
-                    'رقم الهاتف',
-                    '+213 555 555 555',
-                    () => _launchPhone(context),
-                  ),
-                  _buildContactItem(
-                    context,
-                    Icons.chat_bubble_outline,
-                    'الدردشة المباشرة',
-                    'متوفرة من 9 صباحاً إلى 5 مساءً',
-                    () => _launchChat(context),
-                  ),
-                ],
-              ),
-              
-              const SizedBox(height: 20),
-              
-              // Help Resources Section
-              _buildSectionCard(
-                context,
-                title: 'مصادر المساعدة',
-                icon: Icons.school,
-                children: [
-                  _buildResourceItem(
-                    context,
-                    Icons.book,
-                    'الدليل الكامل للاستخدام',
-                    'تعليمات مفصلة حول كيفية استخدام جميع ميزات التطبيق.',
-                    () => _openGuide(context),
-                  ),
-                  _buildResourceItem(
-                    context,
-                    Icons.policy,
-                    'سياسات الموقع',
-                    'تفاصيل سياسات الخصوصية، الإلغاء، والشروط والأحكام.',
-                    () => _openPolicies(context),
-                  ),
-                  _buildResourceItem(
-                    context,
-                    Icons.chat,
-                    'مدونة المساعدة',
-                    'نصائح واستراتيجيات لتحسين تجربة استخدام التطبيق.',
-                    () => _openBlog(context),
-                  ),
-                ],
-              ),
-            ],
+            ),
           ),
         ),
       ),

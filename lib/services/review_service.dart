@@ -12,32 +12,33 @@ class ReviewService {
     bool verifiedOnly = true,
   }) async {
     try {
+      // Build filter first to keep filter builder type (so eq is available), then apply order/range
+      var filter = _supabase
           .from('reviews')
           .select('''
             *,
-            profiles!reviews_guest_id_fkey(
-            profiles!reviews_guest_id_fkey(
+            profiles:profiles!reviews_guest_id_fkey(
               full_name,
               avatar_url
             ),
-              full_name,
-              avatar_url
-            ),
-            accommodations!reviews_accommodation_id_fkey(
+            accommodations:accommodations!reviews_accommodation_id_fkey(
               title
             )
           ''')
           .eq('accommodation_id', accommodationId);
 
       if (verifiedOnly) {
-      final response = await query
+        filter = filter.eq('is_verified', true);
       }
 
-      final response = await query
-      return (response as List).map((json) {
-        final profile = json['profiles'];
-        final accommodation = json['accommodations'];
-        
+      final response = await filter
+          .order('created_at', ascending: false)
+          .range(offset, offset + limit - 1);
+
+      return (response as List).map<Review>((e) {
+        final json = e as Map<String, dynamic>;
+        final profile = json['profiles'] as Map<String, dynamic>?;
+        final accommodation = json['accommodations'] as Map<String, dynamic>?;
         return Review.fromJson({
           ...json,
           'guest_name': profile?['full_name'],
@@ -45,48 +46,8 @@ class ReviewService {
           'accommodation_title': accommodation?['title'],
         });
       }).toList();
-      // Calculate statistics
-      final reviews = response as List<Map<String, dynamic>>;
-      final totalReviews = reviews.length;
-      final averageRating = reviews
-          .map((r) => r['rating'] as int)
-          .reduce((a, b) => a + b) / totalReviews;
-
-      // Rating distribution
-      final ratingDistribution = <int, int>{5: 0, 4: 0, 3: 0, 2: 0, 1: 0};
-      for (final review in reviews) {
-        final rating = review['rating'] as int;
-        ratingDistribution[rating] = (ratingDistribution[rating] ?? 0) + 1;
-      }
-
-      // Detailed averages
-      final detailedAverages = <String, double>{};
-      final detailKeys = ['cleanliness_rating', 'location_rating', 'value_rating', 'communication_rating'];
-      final detailNames = ['cleanliness', 'location', 'value', 'communication'];
-      
-      for (int i = 0; i < detailKeys.length; i++) {
-        final key = detailKeys[i];
-        final name = detailNames[i];
-        final ratings = reviews
-            .where((r) => r[key] != null)
-            .map((r) => r[key] as int)
-            .toList();
-        
-        if (ratings.isNotEmpty) {
-          detailedAverages[name] = ratings.reduce((a, b) => a + b) / ratings.length;
-        } else {
-          detailedAverages[name] = 0.0;
-        }
-      }
-
-      return {
-        'total_reviews': totalReviews,
-        'average_rating': averageRating,
-        'rating_distribution': ratingDistribution,
-        'detailed_averages': detailedAverages,
-      };
     } catch (e) {
-      throw Exception('فشل في جلب إحصائيات التقييمات: ${e.toString()}');
+      throw Exception('فشل في جلب التقييمات: $e');
     }
   }
 
@@ -94,50 +55,34 @@ class ReviewService {
   static Future<bool> canUserReview(String accommodationId) async {
     try {
       final user = _supabase.auth.currentUser;
-      if (user == null) {
-        print('Debug: canUserReview - No user logged in');
-        return false;
-      }
+      if (user == null) return false;
 
-      print('Debug: canUserReview - Checking for user ${user.id} and accommodation $accommodationId');
-
-      // Check if user has a booking for this accommodation that has passed checkout date
-      final bookingResponse = await _supabase
+      final bookings = await _supabase
           .from('bookings')
           .select('id, check_out_date, status')
           .eq('guest_id', user.id)
           .eq('accommodation_id', accommodationId)
-          .neq('status', 'cancelled') // Exclude cancelled bookings
+          .neq('status', 'cancelled')
           .limit(1);
 
-      print('Debug: canUserReview - Found ${bookingResponse.length} eligible bookings');
-      if (bookingResponse.isEmpty) return false;
+      if ((bookings as List).isEmpty) return false;
 
-      // Check if checkout date has passed
-      final booking = bookingResponse.first;
-      final checkoutDate = DateTime.parse(booking['check_out_date']);
+      final booking = (bookings.first) as Map<String, dynamic>;
+      final checkoutDate = DateTime.parse(booking['check_out_date'] as String);
       final now = DateTime.now();
-      final checkoutDatePassed = checkoutDate.isBefore(now) || 
-                                checkoutDate.isAtSameMomentAs(DateTime(now.year, now.month, now.day));
-      
-      print('Debug: canUserReview - Checkout date: $checkoutDate, passed: $checkoutDatePassed');
-      if (!checkoutDatePassed) return false;
+      final passed = checkoutDate.isBefore(now) ||
+          checkoutDate.isAtSameMomentAs(DateTime(now.year, now.month, now.day));
+      if (!passed) return false;
 
-      // Check if user already reviewed this accommodation
-      final reviewResponse = await _supabase
+      final existing = await _supabase
           .from('reviews')
           .select('id')
           .eq('guest_id', user.id)
           .eq('accommodation_id', accommodationId)
           .limit(1);
 
-      final hasExistingReview = reviewResponse.isNotEmpty;
-      print('Debug: canUserReview - Has existing review: $hasExistingReview');
-      print('Debug: canUserReview - Final result: ${!hasExistingReview}');
-
-      return reviewResponse.isEmpty;
-    } catch (e) {
-      print('Debug: canUserReview - Error: $e');
+      return (existing as List).isEmpty;
+    } catch (_) {
       return false;
     }
   }
@@ -148,15 +93,15 @@ class ReviewService {
       final user = _supabase.auth.currentUser;
       if (user == null) return null;
 
-      final response = await _supabase
+      final res = await _supabase
           .from('reviews')
           .select('''
             *,
-            profiles!reviews_guest_id_fkey(
+            profiles:profiles!reviews_guest_id_fkey(
               full_name,
               avatar_url
             ),
-            accommodations!reviews_accommodation_id_fkey(
+            accommodations:accommodations!reviews_accommodation_id_fkey(
               title
             )
           ''')
@@ -164,28 +109,24 @@ class ReviewService {
           .eq('accommodation_id', accommodationId)
           .limit(1);
 
-      if (response.isEmpty) return null;
+      if ((res as List).isEmpty) return null;
+      final json = res.first as Map<String, dynamic>;
+      final profile = json['profiles'] as Map<String, dynamic>?;
+      final accommodation = json['accommodations'] as Map<String, dynamic>?;
 
-      final json = response.first;
-      final profile = json['profiles'];
-      final accommodation = json['accommodations'];
-      
       return Review.fromJson({
         ...json,
         'guest_name': profile?['full_name'],
         'guest_avatar': profile?['avatar_url'],
         'accommodation_title': accommodation?['title'],
       });
-    } catch (e) {
+    } catch (_) {
       return null;
-      final response = await _supabase
+    }
+  }
 
   // Add a new review
   static Future<Review> addReview({
-            profiles!reviews_guest_id_fkey(
-              full_name,
-              avatar_url
-            ),
     String? bookingId,
     required String accommodationId,
     required int rating,
@@ -194,41 +135,49 @@ class ReviewService {
     int? cleanlinessRating,
     int? locationRating,
     int? valueRating,
-      if (response.isEmpty) return null;
+    int? communicationRating,
     List<String>? images,
-      final json = response.first;
-      final profile = json['profiles'];
+  }) async {
+    try {
+      final user = _supabase.auth.currentUser;
+      if (user == null) {
+        throw Exception('يجب تسجيل الدخول لإضافة تقييم');
+      }
+
+      final Map<String, dynamic> reviewData = {
+        'guest_id': user.id,
+        'accommodation_id': accommodationId,
+        'rating': rating,
+        'title': title,
+        'comment': comment,
+        'cleanliness_rating': cleanlinessRating,
         'location_rating': locationRating,
         'value_rating': valueRating,
         'communication_rating': communicationRating,
-        'images': images ?? [],
-        'guest_name': profile?['full_name'],
-        'guest_avatar': profile?['avatar_url'],
+        'images': images ?? <String>[],
+      };
       if (bookingId != null) {
         reviewData['booking_id'] = bookingId;
       }
-      print('Debug: addReview - Inserting review data: $reviewData');
 
       final response = await _supabase
           .from('reviews')
           .insert(reviewData)
           .select('''
             *,
-            profiles!reviews_guest_id_fkey(
+            profiles:profiles!reviews_guest_id_fkey(
               full_name,
               avatar_url
             ),
-            accommodations!reviews_accommodation_id_fkey(
+            accommodations:accommodations!reviews_accommodation_id_fkey(
               title
             )
           ''')
           .single();
 
-      print('Debug: addReview - Successfully inserted review with ID: ${response['id']}');
+      final profile = response['profiles'] as Map<String, dynamic>?;
+      final accommodation = response['accommodations'] as Map<String, dynamic>?;
 
-      final profile = response['profiles'];
-      final accommodation = response['accommodations'];
-      
       return Review.fromJson({
         ...response,
         'guest_name': profile?['full_name'],
@@ -236,8 +185,7 @@ class ReviewService {
         'accommodation_title': accommodation?['title'],
       });
     } catch (e) {
-      print('Debug: addReview - Error: $e');
-      throw Exception('فشل في إضافة التقييم: ${e.toString()}');
+      throw Exception('فشل في إضافة التقييم: $e');
     }
   }
 
@@ -269,25 +217,25 @@ class ReviewService {
             'location_rating': locationRating,
             'value_rating': valueRating,
             'communication_rating': communicationRating,
-            'images': images ?? [],
+            'images': images ?? <String>[],
           })
           .eq('id', reviewId)
           .eq('guest_id', user.id)
           .select('''
             *,
-            profiles!reviews_guest_id_fkey(
+            profiles:profiles!reviews_guest_id_fkey(
               full_name,
               avatar_url
             ),
-            accommodations!reviews_accommodation_id_fkey(
+            accommodations:accommodations!reviews_accommodation_id_fkey(
               title
             )
           ''')
           .single();
 
-      final profile = response['profiles'];
-      final accommodation = response['accommodations'];
-      
+      final profile = response['profiles'] as Map<String, dynamic>?;
+      final accommodation = response['accommodations'] as Map<String, dynamic>?;
+
       return Review.fromJson({
         ...response,
         'guest_name': profile?['full_name'],
@@ -295,7 +243,7 @@ class ReviewService {
         'accommodation_title': accommodation?['title'],
       });
     } catch (e) {
-      throw Exception('فشل في تحديث التقييم: ${e.toString()}');
+      throw Exception('فشل في تحديث التقييم: $e');
     }
   }
 
@@ -313,7 +261,7 @@ class ReviewService {
           .eq('id', reviewId)
           .eq('guest_id', user.id);
     } catch (e) {
-      throw Exception('فشل في حذف التقييم: ${e.toString()}');
+      throw Exception('فشل في حذف التقييم: $e');
     }
   }
 
@@ -335,9 +283,9 @@ class ReviewService {
           .select('owner_id')
           .eq('id', accommodationId)
           .eq('owner_id', user.id)
-          .single();
+          .limit(1);
 
-      if (accommodationResponse.isEmpty) {
+      if ((accommodationResponse as List).isEmpty) {
         throw Exception('غير مسموح لك بالرد على هذا التقييم');
       }
 
@@ -350,7 +298,7 @@ class ReviewService {
           .eq('id', reviewId)
           .eq('accommodation_id', accommodationId);
     } catch (e) {
-      throw Exception('فشل في إضافة الرد: ${e.toString()}');
+      throw Exception('فشل في إضافة الرد: $e');
     }
   }
 
@@ -369,11 +317,11 @@ class ReviewService {
           .from('reviews')
           .select('''
             *,
-            profiles!reviews_guest_id_fkey(
+            profiles:profiles!reviews_guest_id_fkey(
               full_name,
               avatar_url
             ),
-            accommodations!reviews_accommodation_id_fkey(
+            accommodations:accommodations!reviews_accommodation_id_fkey(
               title
             )
           ''')
@@ -381,10 +329,10 @@ class ReviewService {
           .order('created_at', ascending: false)
           .range(offset, offset + limit - 1);
 
-      return (response as List).map((json) {
-        final profile = json['profiles'];
-        final accommodation = json['accommodations'];
-        
+      return (response as List).map<Review>((e) {
+        final json = e as Map<String, dynamic>;
+        final profile = json['profiles'] as Map<String, dynamic>?;
+        final accommodation = json['accommodations'] as Map<String, dynamic>?;
         return Review.fromJson({
           ...json,
           'guest_name': profile?['full_name'],
@@ -393,7 +341,96 @@ class ReviewService {
         });
       }).toList();
     } catch (e) {
-      throw Exception('فشل في جلب تقييماتك: ${e.toString()}');
+      throw Exception('فشل في جلب تقييماتك: $e');
+    }
+  }
+
+  // احصائيات التقييمات لإقامة معيّنة
+  static Future<Map<String, dynamic>> getAccommodationReviewStats(
+    String accommodationId, {
+    bool verifiedOnly = true,
+  }) async {
+    try {
+      var query = _supabase
+          .from('reviews')
+          .select('rating, cleanliness_rating, location_rating, value_rating, communication_rating, is_verified')
+          .eq('accommodation_id', accommodationId);
+
+      if (verifiedOnly) {
+        query = query.eq('is_verified', true);
+      }
+
+      final rows = await query;
+      final list = (rows as List).cast<Map<String, dynamic>>();
+      final total = list.length;
+      if (total == 0) {
+        return {
+          'total_reviews': 0,
+          'average_rating': 0.0,
+          'rating_distribution': {for (var i = 1; i <= 5; i++) i: 0},
+          'detailed_averages': {
+            'cleanliness': 0.0,
+            'location': 0.0,
+            'value': 0.0,
+            'communication': 0.0,
+          },
+        };
+      }
+
+      int ratingSum = 0;
+      final Map<int, int> distribution = {for (var i = 1; i <= 5; i++) i: 0};
+
+      int cleanlinessSum = 0, cleanlinessCount = 0;
+      int locationSum = 0, locationCount = 0;
+      int valueSum = 0, valueCount = 0;
+      int communicationSum = 0, communicationCount = 0;
+
+      for (final row in list) {
+        final rating = (row['rating'] as num).toInt();
+        ratingSum += rating;
+        if (distribution.containsKey(rating)) {
+          distribution[rating] = (distribution[rating] ?? 0) + 1;
+        }
+
+        final cr = row['cleanliness_rating'];
+        if (cr != null) {
+          cleanlinessSum += (cr as num).toInt();
+          cleanlinessCount++;
+        }
+        final lr = row['location_rating'];
+        if (lr != null) {
+          locationSum += (lr as num).toInt();
+          locationCount++;
+        }
+        final vr = row['value_rating'];
+        if (vr != null) {
+          valueSum += (vr as num).toInt();
+          valueCount++;
+        }
+        final comm = row['communication_rating'];
+        if (comm != null) {
+          communicationSum += (comm as num).toInt();
+          communicationCount++;
+        }
+      }
+
+      final average = ratingSum / total;
+
+      final Map<String, double> detailedAverages = {
+        'cleanliness': cleanlinessCount > 0 ? cleanlinessSum / cleanlinessCount : 0.0,
+        'location': locationCount > 0 ? locationSum / locationCount : 0.0,
+        'value': valueCount > 0 ? valueSum / valueCount : 0.0,
+        'communication': communicationCount > 0 ? communicationSum / communicationCount : 0.0,
+      };
+
+      return {
+        'total_reviews': total,
+        'average_rating': average.toDouble(),
+        'rating_distribution': distribution,
+        'detailed_averages': detailedAverages,
+      };
+    } catch (e) {
+      throw Exception('فشل في جلب إحصائيات التقييمات: $e');
     }
   }
 }
