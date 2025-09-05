@@ -439,54 +439,56 @@ class _BookingsScreenState extends State<BookingsScreen>
     final now = DateTime.now();
     final checkoutDatePassed = booking.checkOutDate.isBefore(now) || 
                                booking.checkOutDate.isAtSameMomentAs(DateTime(now.year, now.month, now.day));
-    
-    // If checkout date has passed, show review button
-    if (checkoutDatePassed) {
-      // Show review button for bookings that have passed checkout date (regardless of status)
-      // but exclude cancelled bookings
-      if (booking.status != BookingStatus.cancelled) {
-        return SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: booking.canReview ? () => _showAddReviewDialog(context, booking) : null,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: booking.canReview 
-                  ? (Theme.of(context).brightness == Brightness.dark
-                      ? AppStyles.darkPrimaryColor
-                      : AppStyles.primaryColor)
-                  : (Theme.of(context).brightness == Brightness.dark
-                      ? Colors.grey[600]
-                      : Colors.grey[400]),
-              foregroundColor: booking.canReview 
+
+    // If booking is cancelled, show no actions
+    if (booking.status == BookingStatus.cancelled) {
+      return const SizedBox.shrink();
+    }
+
+    // Determine if review is currently allowed
+    final bool reviewEnabled = checkoutDatePassed && booking.canReview;
+
+    // For confirmed or completed bookings: show review button (replace modify/cancel)
+    if (booking.status == BookingStatus.confirmed || booking.status == BookingStatus.completed) {
+      return SizedBox(
+        width: double.infinity,
+        child: ElevatedButton(
+          onPressed: reviewEnabled ? () => _showAddReviewDialog(context, booking) : null,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: reviewEnabled 
+                ? (Theme.of(context).brightness == Brightness.dark
+                    ? AppStyles.darkPrimaryColor
+                    : AppStyles.primaryColor)
+                : (Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[600]
+                    : Colors.grey[400]),
+            foregroundColor: reviewEnabled 
+                ? Colors.white
+                : (Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[300]
+                    : Colors.grey[700]),
+          ),
+          child: Text(
+            reviewEnabled
+                ? 'أضف تقييم'
+                : (checkoutDatePassed ? 'تم إضافة التقييم' : 'التقييم متاح بعد انتهاء الحجز'),
+            style: TextStyle(
+              fontFamily: 'Tajawal',
+              color: reviewEnabled 
                   ? Colors.white
                   : (Theme.of(context).brightness == Brightness.dark
                       ? Colors.grey[300]
                       : Colors.grey[700]),
             ),
-            child: Text(
-              booking.canReview ? 'أضف تقييم' : 'تم إضافة التقييم',
-              style: TextStyle(
-                fontFamily: 'Tajawal',
-                color: booking.canReview 
-                    ? Colors.white
-                    : (Theme.of(context).brightness == Brightness.dark
-                        ? Colors.grey[300]
-                        : Colors.grey[700]),
-              ),
-            ),
           ),
-        );
-      } else {
-        // For cancelled bookings, show no action buttons
-        return const SizedBox.shrink();
-      }
+        ),
+      );
     }
     
-    // Before checkout date, show modify and cancel buttons
+    // For pending bookings: allow modify and cancel
     return Row(
       children: [
-        if (booking.status == BookingStatus.pending ||
-            booking.status == BookingStatus.confirmed)
+        if (booking.status == BookingStatus.pending)
           Expanded(
             child: ElevatedButton(
               onPressed: () => _modifyBooking(booking),
@@ -500,11 +502,9 @@ class _BookingsScreenState extends State<BookingsScreen>
               ),
             ),
           ),
-        if (booking.status == BookingStatus.pending ||
-            booking.status == BookingStatus.confirmed)
+        if (booking.status == BookingStatus.pending)
           const SizedBox(width: 8),
-        if (booking.status != BookingStatus.cancelled &&
-            booking.status != BookingStatus.completed)
+        if (booking.status == BookingStatus.pending)
           Expanded(
             child: ElevatedButton(
               onPressed: () => _cancelBooking(booking),
