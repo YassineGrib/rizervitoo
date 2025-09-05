@@ -12,11 +12,14 @@ class ReviewService {
     bool verifiedOnly = true,
   }) async {
     try {
-      var query = _supabase
           .from('reviews')
           .select('''
             *,
             profiles!reviews_guest_id_fkey(
+            profiles!reviews_guest_id_fkey(
+              full_name,
+              avatar_url
+            ),
               full_name,
               avatar_url
             ),
@@ -27,13 +30,10 @@ class ReviewService {
           .eq('accommodation_id', accommodationId);
 
       if (verifiedOnly) {
-        query = query.eq('is_verified', true);
+      final response = await query
       }
 
       final response = await query
-          .order('created_at', ascending: false)
-          .range(offset, offset + limit - 1);
-
       return (response as List).map((json) {
         final profile = json['profiles'];
         final accommodation = json['accommodations'];
@@ -45,36 +45,6 @@ class ReviewService {
           'accommodation_title': accommodation?['title'],
         });
       }).toList();
-    } catch (e) {
-      throw Exception('فشل في جلب التقييمات: ${e.toString()}');
-    }
-  }
-
-  // Get review statistics for an accommodation
-  static Future<Map<String, dynamic>> getAccommodationReviewStats(
-    String accommodationId,
-  ) async {
-    try {
-      final response = await _supabase
-          .from('reviews')
-          .select('rating, cleanliness_rating, location_rating, value_rating, communication_rating')
-          .eq('accommodation_id', accommodationId)
-          .eq('is_verified', true);
-
-      if (response.isEmpty) {
-        return {
-          'total_reviews': 0,
-          'average_rating': 0.0,
-          'rating_distribution': {5: 0, 4: 0, 3: 0, 2: 0, 1: 0},
-          'detailed_averages': {
-            'cleanliness': 0.0,
-            'location': 0.0,
-            'value': 0.0,
-            'communication': 0.0,
-          },
-        };
-      }
-
       // Calculate statistics
       final reviews = response as List<Map<String, dynamic>>;
       final totalReviews = reviews.length;
@@ -208,11 +178,14 @@ class ReviewService {
       });
     } catch (e) {
       return null;
-    }
-  }
+      final response = await _supabase
 
   // Add a new review
   static Future<Review> addReview({
+            profiles!reviews_guest_id_fkey(
+              full_name,
+              avatar_url
+            ),
     String? bookingId,
     required String accommodationId,
     required int rating,
@@ -221,42 +194,19 @@ class ReviewService {
     int? cleanlinessRating,
     int? locationRating,
     int? valueRating,
-    int? communicationRating,
+      if (response.isEmpty) return null;
     List<String>? images,
-  }) async {
-    try {
-      final user = _supabase.auth.currentUser;
-      if (user == null) {
-        print('Debug: addReview - No user logged in');
-        throw Exception('يجب تسجيل الدخول لإضافة تقييم');
-      }
-
-      print('Debug: addReview - User: ${user.id}, Accommodation: $accommodationId, Booking: $bookingId');
-
-      // Validate that user can review
-      final canReview = await canUserReview(accommodationId);
-      if (!canReview) {
-        print('Debug: addReview - User cannot review this accommodation');
-        throw Exception('لا يمكنك تقييم هذه الإقامة. يجب أن تكون قد أقمت فيها وانتهى تاريخ المغادرة.');
-      }
-
-      final reviewData = {
-        'guest_id': user.id,
-        'accommodation_id': accommodationId,
-        'rating': rating,
-        'title': title,
-        'comment': comment,
-        'cleanliness_rating': cleanlinessRating,
+      final json = response.first;
+      final profile = json['profiles'];
         'location_rating': locationRating,
         'value_rating': valueRating,
         'communication_rating': communicationRating,
         'images': images ?? [],
-      };
-
+        'guest_name': profile?['full_name'],
+        'guest_avatar': profile?['avatar_url'],
       if (bookingId != null) {
         reviewData['booking_id'] = bookingId;
       }
-
       print('Debug: addReview - Inserting review data: $reviewData');
 
       final response = await _supabase
