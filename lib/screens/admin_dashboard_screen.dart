@@ -7,6 +7,7 @@ import 'admin_travel_guides_screen.dart';
 import 'admin_users_screen.dart';
 import 'admin_reviews_screen.dart';
 import 'admin/travel_agencies_admin_screen.dart';
+import 'admin/accommodations_admin_screen.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -551,6 +552,28 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   ),
                 ),
               ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 18),
+        Row(
+          children: [
+            Expanded(
+              child: _buildManagementCard(
+                ' إدارة الاستضافات',
+                Icons.home_work,
+                Colors.teal,
+                () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AccommodationsAdminScreen(),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 18),
+            Expanded(
+              child: Container(), // Empty space for symmetry
             ),
           ],
         ),

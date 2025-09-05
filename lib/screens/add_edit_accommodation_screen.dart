@@ -59,8 +59,6 @@ class _AddEditAccommodationScreenState extends State<AddEditAccommodationScreen>
     {'key': 'apartment', 'label': 'شقة'},
     {'key': 'house', 'label': 'منزل'},
     {'key': 'villa', 'label': 'فيلا'},
-    {'key': 'studio', 'label': 'استوديو'},
-    {'key': 'room', 'label': 'غرفة'},
     {'key': 'hotel', 'label': 'فندق'},
     {'key': 'guesthouse', 'label': 'بيت ضيافة'},
     {'key': 'hostel', 'label': 'نزل'},

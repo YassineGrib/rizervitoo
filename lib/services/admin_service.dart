@@ -495,4 +495,103 @@ class AdminService {
       };
     }
   }
+
+  // Accommodation Management Operations
+  
+  // Get pending accommodations (not verified)
+  static Future<List<Map<String, dynamic>>> getPendingAccommodations() async {
+    try {
+      final response = await _supabase
+          .from('accommodations')
+          .select('''
+            *,
+            profiles!accommodations_owner_id_fkey(
+              full_name,
+              phone
+            )
+          ''')
+          .eq('is_verified', false)
+          .order('created_at', ascending: false);
+
+      return (response as List).map<Map<String, dynamic>>((json) {
+        final profile = json['profiles'];
+        
+        return {
+          ...json,
+          'owner_name': profile?['full_name'],
+          'owner_phone': profile?['phone'],
+          'owner_email': 'غير متاح', // Email not available from profiles table
+        };
+      }).toList();
+    } catch (e) {
+      throw Exception('فشل في جلب الاستضافات قيد المراجعة: ${e.toString()}');
+    }
+  }
+
+  // Get all accommodations (verified and unverified)
+  static Future<List<Map<String, dynamic>>> getAllAccommodations() async {
+    try {
+      final response = await _supabase
+          .from('accommodations')
+          .select('''
+            *,
+            profiles!accommodations_owner_id_fkey(
+              full_name,
+              phone
+            )
+          ''')
+          .order('created_at', ascending: false);
+
+      return (response as List).map<Map<String, dynamic>>((json) {
+        final profile = json['profiles'];
+        
+        return {
+          ...json,
+          'owner_name': profile?['full_name'],
+          'owner_phone': profile?['phone'],
+          'owner_email': 'غير متاح', // Email not available from profiles table
+        };
+      }).toList();
+    } catch (e) {
+      throw Exception('فشل في جلب جميع الاستضافات: ${e.toString()}');
+    }
+  }
+
+  // Approve an accommodation (set is_verified to true)
+  static Future<void> approveAccommodation(String accommodationId) async {
+    try {
+      await _supabase
+          .from('accommodations')
+          .update({'is_verified': true})
+          .eq('id', accommodationId);
+    } catch (e) {
+      throw Exception('فشل في قبول الاستضافة: ${e.toString()}');
+    }
+  }
+
+  // Reject an accommodation (delete it or mark as rejected)
+  static Future<void> rejectAccommodation(String accommodationId) async {
+    try {
+      // For now, we'll delete rejected accommodations
+      // In the future, you might want to add a 'status' field instead
+      await _supabase
+          .from('accommodations')
+          .delete()
+          .eq('id', accommodationId);
+    } catch (e) {
+      throw Exception('فشل في رفض الاستضافة: ${e.toString()}');
+    }
+  }
+
+  // Toggle accommodation availability
+  static Future<void> toggleAccommodationAvailability(String accommodationId, bool isAvailable) async {
+    try {
+      await _supabase
+          .from('accommodations')
+          .update({'is_available': isAvailable})
+          .eq('id', accommodationId);
+    } catch (e) {
+      throw Exception('فشل في تغيير حالة الاستضافة: ${e.toString()}');
+    }
+  }
 }
